@@ -2,7 +2,8 @@
 <html lang="fa" dir="rtl">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#120a1a">
 <title>گرامافون</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -462,6 +463,13 @@
   .tracks.playing .current .track-num b { display: none; }
   .track-num b { font-weight: 400; }
 
+  /* Spotify: read-only status header above the official embed */
+  .bar { height: 6px; border-radius: 6px; background: var(--line); overflow: hidden; direction: ltr; }
+  .bar span { display: block; height: 100%; width: 0; background: var(--accent); transition: width .3s linear; }
+  .sp-hint { margin: 14px 2px 0; font-size: .8125rem; color: var(--muted); }
+  .sp-embed { margin-top: 14px; border-radius: 12px; overflow: hidden; }
+  .sp-embed iframe { display: block; width: 100%; border: 0; }
+
   /* the official SoundCloud iframe stays invisible: it only produces the sound */
   .official iframe { display: block; width: 100%; border: 0; }
   .official.off {
@@ -575,6 +583,71 @@
     .record, .eq i { animation: none; }
     .record-slide, .stage::before, body { transition: none; }
   }
+
+  /* ───────── phone / Telegram in-app browser ───────── */
+  html { -webkit-text-size-adjust: 100%; }
+  html, body { overflow-x: clip; }
+  .stage::before { max-width: 100%; }
+  body { min-height: 100vh; min-height: 100dvh; }
+  button, .linkbtn, .track-btn, .item-main { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+
+  .page {
+    padding-top: max(24px, env(safe-area-inset-top));
+    padding-right: max(24px, env(safe-area-inset-right));
+    padding-left: max(24px, env(safe-area-inset-left));
+    padding-bottom: max(64px, calc(env(safe-area-inset-bottom) + 32px));
+  }
+
+  /* bigger touch target around the thin slider line */
+  .range {
+    height: 26px;
+    padding: 10px 0;
+    border-radius: 13px;
+    background-clip: content-box;
+    background-origin: content-box;
+  }
+
+  .track.pending .track-title { color: var(--dim); }
+  .track-title, .track-artist, .np-title, .np-artist, .item-title { text-align: right; unicode-bidi: plaintext; }
+  html.ios .vol { display: none; }          /* iOS ignores programmatic volume */
+  .note.info { color: var(--muted); }
+
+  @media (pointer: coarse) {
+    .icon-btn { width: 40px; height: 40px; }
+    .cbtn { width: 48px; height: 48px; }
+    .cbtn.play { width: 64px; height: 64px; }
+    .item-main { padding: 12px 14px; }
+    .range::-webkit-slider-thumb { width: 22px; height: 22px; }
+    .range::-moz-range-thumb { width: 22px; height: 22px; }
+    .social a { padding: 8px 14px; }
+    .linkbtn { padding: 10px 0; }
+  }
+
+  @media (max-width: 520px) {
+    .page {
+      padding-top: max(14px, env(safe-area-inset-top));
+      padding-right: max(16px, env(safe-area-inset-right));
+      padding-left: max(16px, env(safe-area-inset-left));
+      padding-bottom: max(40px, calc(env(safe-area-inset-bottom) + 24px));
+    }
+    .brand { font-size: 1.3rem; }
+    .hero { margin-top: 24px; }
+    h1 { font-size: clamp(2rem, 9.5vw, 2.6rem); }
+    .lead { margin: 8px 0 18px; font-size: .9375rem; }
+    .field input { padding: 14px 16px; }
+    .layout { margin-top: 28px; gap: 36px; }
+    .stage { --size: min(230px, 60vw); }
+    .np { gap: 12px; }
+    .np-title { font-size: 1rem; }
+    .seek { grid-template-columns: 38px 1fr 38px; gap: 8px; margin-top: 14px; }
+    .controls { grid-template-columns: 1fr; justify-items: center; row-gap: 8px; margin-top: 8px; }
+    .controls > span { display: none; }
+    .vol { justify-self: stretch; }
+    .vol .range { flex: 1; width: auto; }
+    .tracks { max-height: 300px; }
+    .track-btn { padding: 10px 8px; gap: 10px; }
+    .library h2 { font-size: 1.4rem; }
+  }
 </style>
 </head>
 <body>
@@ -614,7 +687,7 @@
 
     <form id="form" class="field" autocomplete="off" novalidate>
       <input id="link" type="text" dir="auto" inputmode="url" spellcheck="false"
-             placeholder="لینک رو این‌جا بچسبون…" aria-label="لینک پلی‌لیست" aria-describedby="msg">
+             enterkeyhint="go" placeholder="لینک رو این‌جا بچسبون…" aria-label="لینک پلی‌لیست" aria-describedby="msg">
       <button type="submit">پخش کن</button>
     </form>
     <p id="msg" class="hint" role="status">پلی‌لیست، آلبوم و ترک از ساندکلود و اسپاتیفای پشتیبانی می‌شه.</p>
@@ -660,8 +733,15 @@
   const stage = $('#stage'), player = $('#player'), empty = $('#empty'), caption = $('#caption');
   const list = $('#list'), libEmpty = $('#lib-empty'), fallback = $('#fallback');
 
+  // Spotify blocks direct title/cover lookups from other sites. If that happens, the page
+  // retries through a public relay (only the Spotify link is sent). Set to false to disable.
+  const USE_PROXY = true;
+
   // opened inside a preview frame instead of directly in the browser
   if (window.self !== window.top) $('#preview-warning').hidden = false;
+
+  const IS_IOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  if (IS_IOS) document.documentElement.classList.add('ios');
 
   const DEFAULT_HINT = 'پلی‌لیست، آلبوم و ترک از ساندکلود و اسپاتیفای پشتیبانی می‌شه.';
   const SPOTIFY_NOTE = 'برای پخش کامل، توی همین مرورگر وارد اکانت اسپاتیفایت شو؛ وگرنه فقط ۳۰ ثانیه‌ی اول هر آهنگ پخش می‌شه.';
@@ -675,6 +755,7 @@
   };
   const LS_LIB = 'gramafon:library', LS_LAST = 'gramafon:last', LS_VOL = 'gramafon:volume';
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
   /* ── storage (safe when the browser blocks it) ── */
   const read = (k, fallbackValue) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : fallbackValue; } catch { return fallbackValue; } };
@@ -686,9 +767,36 @@
   let currentKey = read(LS_LAST, null);
   let swapTimer = null;
   let mountToken = 0;
-  let activeSc = null;
+  let active = null;
 
-  const setTheme = (source) => { document.documentElement.dataset.theme = source || ''; };
+  /* ── theme + Telegram / browser bar colors ── */
+  const THEME_BG = { '': '#120a1a', spotify: '#07130c', soundcloud: '#170a04' };
+  function tgColors(c) {
+    const tg = window.Telegram && window.Telegram.WebApp;
+    if (!tg) return;
+    try { tg.setHeaderColor(c); tg.setBackgroundColor(c); } catch {}
+  }
+  function setTheme(source) {
+    document.documentElement.dataset.theme = source || '';
+    const c = THEME_BG[source || ''];
+    const m = document.querySelector('meta[name="theme-color"]');
+    if (m) m.content = c;
+    tgColors(c);
+  }
+  (function telegramInit() {
+    const inTg = /Telegram/i.test(navigator.userAgent) || location.hash.includes('tgWebApp') || !!window.TelegramWebviewProxy;
+    if (!inTg) return;
+    const s = document.createElement('script');
+    s.src = 'https://telegram.org/js/telegram-web-app.js';
+    s.onload = () => {
+      const tg = window.Telegram && window.Telegram.WebApp;
+      if (!tg) return;
+      try { tg.ready(); tg.expand(); if (tg.disableVerticalSwipes) tg.disableVerticalSwipes(); } catch {}
+      tgColors(THEME_BG[document.documentElement.dataset.theme || '']);
+    };
+    document.head.append(s);
+  })();
+
   const fmt = (ms) => {
     const t = Math.max(0, Math.floor((ms || 0) / 1000));
     const h = Math.floor(t / 3600), m = Math.floor((t % 3600) / 60), s = t % 60;
@@ -739,21 +847,65 @@
     return null;
   }
 
+  /* ── oEmbed helpers ── */
+  async function getJson(url, ms) {
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), ms || 6000);
+    try {
+      const r = await fetch(url, { signal: ctrl.signal });
+      if (!r.ok) return null;
+      return await r.json();
+    } catch { return null; } finally { clearTimeout(t); }
+  }
+
+  // Spotify: title + cover for any playlist / album / track link (cached)
+  const spMetaCache = new Map();
+  function spotifyMeta(url) {
+    if (spMetaCache.has(url)) return spMetaCache.get(url);
+    const p = (async () => {
+      const q = encodeURIComponent(url);
+      const endpoints = [
+        `https://open.spotify.com/oembed?url=${q}`,
+        `https://embed.spotify.com/oembed?url=${q}`
+      ];
+      if (USE_PROXY) endpoints.push('https://api.allorigins.win/raw?url=' + encodeURIComponent(endpoints[0]));
+      for (const ep of endpoints) {
+        const j = await getJson(ep, 5000);
+        if (j && (j.title || j.thumbnail_url)) {
+          return { title: (j.title || '').trim() || null, thumb: isHttps(j.thumbnail_url) ? j.thumbnail_url : null };
+        }
+      }
+      return null;
+    })();
+    spMetaCache.set(url, p);
+    p.then((m) => { if (!m) spMetaCache.delete(url); });
+    return p;
+  }
+
+  // SoundCloud: title / artist / cover of a track known only by its id
+  async function scMeta(id) {
+    const j = await getJson('https://soundcloud.com/oembed?format=json&url=' + encodeURIComponent('https://api.soundcloud.com/tracks/' + id), 6000);
+    if (!j || !j.title) return null;
+    let title = String(j.title);
+    const artist = j.author_name ? String(j.author_name) : '';
+    if (artist && title.endsWith(' by ' + artist)) title = title.slice(0, -(artist.length + 4));
+    const out = { title };
+    if (artist) out.user = { username: artist };
+    if (isHttps(j.thumbnail_url)) out.artwork_url = j.thumbnail_url;
+    return out;
+  }
+
   /* ── on.soundcloud.com short links → real embeddable URL (best effort) ── */
   async function resolveShort(p) {
-    const ctrl = new AbortController();
-    const t = setTimeout(() => ctrl.abort(), 8000);
-    try {
-      const r = await fetch('https://soundcloud.com/oembed?format=json&url=' + encodeURIComponent(p.url), { signal: ctrl.signal });
-      if (!r.ok) return null;
-      const j = await r.json();
-      const m = /src="([^"]+)"/.exec(j.html || '');
-      if (!m) return null;
-      const embedded = new URL(m[1].replace(/&amp;/g, '&')).searchParams.get('url');
-      if (!embedded) return null;
-      const type = /\/playlists\//.test(embedded) ? 'set' : /\/users\//.test(embedded) ? 'profile' : 'track';
-      return { source: 'soundcloud', type, url: embedded, openUrl: p.url, title: (j.title || '').trim() || null };
-    } catch { return null; } finally { clearTimeout(t); }
+    const j = await getJson('https://soundcloud.com/oembed?format=json&url=' + encodeURIComponent(p.url), 8000);
+    if (!j) return null;
+    const m = /src="([^"]+)"/.exec(j.html || '');
+    if (!m) return null;
+    let embedded = null;
+    try { embedded = new URL(m[1].replace(/&amp;/g, '&')).searchParams.get('url'); } catch {}
+    if (!embedded) return null;
+    const type = /\/playlists\//.test(embedded) ? 'set' : /\/users\//.test(embedded) ? 'profile' : 'track';
+    return { source: 'soundcloud', type, url: embedded, openUrl: p.url, title: (j.title || '').trim() || null };
   }
 
   /* ── official iframes ── */
@@ -779,7 +931,22 @@
     return f;
   }
 
-  /* ── SoundCloud Widget API (loaded on demand) ── */
+  const svg = (inner, extra = '') =>
+    `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ${extra}>${inner}</svg>`;
+  const fillRange = (el) => el.style.setProperty('--p', (Number(el.value) / Number(el.max) * 100) + '%');
+
+  function makeArt(container, url) {
+    container.replaceChildren();
+    if (!isHttps(url)) return;
+    const img = new Image();
+    img.alt = '';
+    img.referrerPolicy = 'no-referrer';
+    img.onerror = () => img.remove();
+    img.src = url;
+    container.append(img);
+  }
+
+  /* ───────────────── SoundCloud: custom player on top of the Widget API ───────────────── */
   let scApiPromise = null;
   function loadScApi() {
     if (window.SC && window.SC.Widget) return Promise.resolve();
@@ -795,9 +962,6 @@
     }
     return scApiPromise;
   }
-
-  const svg = (inner, extra = '') =>
-    `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ${extra}>${inner}</svg>`;
 
   const CP_TEMPLATE = `
     <div class="np">
@@ -830,8 +994,6 @@
     </div>
     <ol class="tracks" data-tracks hidden></ol>`;
 
-  const fillRange = (el) => el.style.setProperty('--p', (Number(el.value) / Number(el.max) * 100) + '%');
-
   function createScPlayer(item, { onPlaying }) {
     const root = document.createElement('div');
     root.className = 'cp';
@@ -861,8 +1023,9 @@
     toggle.textContent = 'نمایش پلیر اصلی ساندکلود';
     foot.append(note, toggle);
 
-    let W = null, ready = false, dead = false, readyTimer = null;
+    let W = null, ready = false, dead = false, readyTimer = null, playWatch = null, autoRevealed = false;
     let sounds = [], idx = 0, dur = 0, dragging = false;
+    const rows = [];
     let vol = Number(read(LS_VOL, 80));
     if (!(vol >= 0 && vol <= 100)) vol = 80;
     els.vol.value = vol;
@@ -875,13 +1038,14 @@
       root.hidden = visible;
       toggle.textContent = visible ? 'برگشت به پلیر گرامافون' : 'نمایش پلیر اصلی ساندکلود';
     }
-    toggle.addEventListener('click', () => showOfficial(official.classList.contains('off')));
+    toggle.addEventListener('click', () => { autoRevealed = false; note.hidden = true; showOfficial(official.classList.contains('off')); });
 
     function fail(text) {
       if (dead) return;
       clearTimeout(readyTimer);
       showOfficial(true);
       note.textContent = text;
+      note.classList.remove('info');
       note.hidden = false;
       onPlaying(false);
     }
@@ -893,32 +1057,58 @@
       onPlaying(p);
     }
 
+    /* Phones (especially iPhone / Telegram) don't let a page start audio inside another
+       site's iframe. If nothing starts, show the official player once so a single tap there
+       unlocks playback, then go back to the gramafon UI. */
+    function requestPlay(action) {
+      action();
+      if (root.classList.contains('is-playing')) return;
+      clearTimeout(playWatch);
+      playWatch = setTimeout(() => {
+        if (dead || root.classList.contains('is-playing')) return;
+        autoRevealed = true;
+        showOfficial(true);
+        note.textContent = 'گوشی اجازه نداد پخش از بیرون شروع بشه. یه بار دکمه‌ی پخش همین پلیر رو بزن؛ بعدش کنترل‌های گرامافون کار می‌کنن.';
+        note.classList.add('info');
+        note.hidden = false;
+      }, 1500);
+    }
+
+    function updateRow(i) {
+      const r = rows[i], s = sounds[i];
+      if (!r || !s) return;
+      r.title.textContent = s.title || `آهنگ ${i + 1}`;
+      r.artist.textContent = s.user && s.user.username ? s.user.username : '';
+      r.time.textContent = s.duration ? fmt(s.duration) : '';
+      r.li.classList.toggle('pending', !s.title);
+    }
+
     function showTrack() {
       const s = sounds[idx];
-      els.title.textContent = s ? (s.title || '—') : 'در حال آماده‌سازی…';
+      els.title.textContent = s && s.title ? s.title : (s ? `آهنگ ${idx + 1}` : 'در حال آماده‌سازی…');
       els.artist.textContent = s && s.user ? (s.user.username || '') : '';
-      els.art.replaceChildren();
-      const artUrl = s && (s.artwork_url || (s.user && s.user.avatar_url));
-      if (isHttps(artUrl)) {
-        const img = new Image();
-        img.alt = '';
-        img.referrerPolicy = 'no-referrer';
-        img.onerror = () => img.remove();
-        img.src = artUrl.replace('-large.', '-t300x300.');
-        els.art.append(img);
-      }
+      makeArt(els.art, s && (s.artwork_url || (s.user && s.user.avatar_url)) ? String(s.artwork_url || s.user.avatar_url).replace('-large.', '-t300x300.') : null);
       if (s && isHttps(s.permalink_url)) { els.link.href = s.permalink_url; els.link.hidden = false; }
       else els.link.hidden = true;
       if (s && s.duration) dur = s.duration;
       els.dur.textContent = fmt(dur);
-      [...els.tracks.children].forEach((li, i) => li.classList.toggle('current', i === idx));
+      rows.forEach((r, i) => r.li.classList.toggle('current', i === idx));
       const many = sounds.length > 1;
       els.prev.disabled = !ready || !many;
       els.next.disabled = !ready || !many;
     }
 
+    // merge fuller data (e.g. from getCurrentSound / oEmbed) into a partially loaded track
+    function mergeSound(i, s) {
+      if (!s || dead) return;
+      sounds[i] = Object.assign({}, sounds[i] || {}, s);
+      updateRow(i);
+      if (i === idx) showTrack();
+    }
+
     function renderTracks() {
       els.tracks.replaceChildren();
+      rows.length = 0;
       els.tracks.hidden = sounds.length < 2;
       sounds.forEach((s, i) => {
         const li = document.createElement('li');
@@ -941,39 +1131,70 @@
         const t = document.createElement('span');
         t.className = 'track-title';
         t.dir = 'auto';
-        t.textContent = s.title || '—';
         const a = document.createElement('span');
         a.className = 'track-artist';
         a.dir = 'auto';
-        a.textContent = s.user ? (s.user.username || '') : '';
         text.append(t, a);
 
         const time = document.createElement('span');
         time.className = 'track-time';
-        time.textContent = fmt(s.duration);
 
         b.append(num, text, time);
-        b.addEventListener('click', () => { if (W && ready) { W.skip(i); W.play(); } });
+        b.addEventListener('click', () => {
+          if (W && ready) requestPlay(() => { W.skip(i); W.play(); });
+        });
         li.append(b);
         els.tracks.append(li);
+        rows[i] = { li, title: t, artist: a, time };
+        updateRow(i);
       });
     }
 
     function syncIndex() {
       if (!W || !ready) return;
       W.getCurrentSoundIndex((i) => {
-        if (typeof i === 'number' && i !== idx) { idx = i; showTrack(); }
+        if (typeof i !== 'number' || i < 0) return;
+        const changed = i !== idx;
+        idx = i;
+        if (changed) showTrack();
+        W.getCurrentSound((s) => mergeSound(idx, s));
       });
     }
 
-    function gotSounds(listOfSounds) {
-      sounds = listOfSounds;
+    // SoundCloud only sends full details for the first few tracks of a playlist.
+    const stubs = () => sounds.map((s, i) => (!s || !s.title ? i : -1)).filter((i) => i >= 0);
+    async function hydrate() {
+      for (let n = 0; n < 3 && !dead && stubs().length; n++) {
+        await sleep(1500);
+        await new Promise((res) => {
+          W.getSounds((found) => {
+            (found || []).forEach((s, i) => { if (s && s.title && sounds[i] && !sounds[i].title) mergeSound(i, s); });
+            res();
+          });
+          setTimeout(res, 1200);
+        });
+      }
+      const todo = stubs().filter((i) => sounds[i] && sounds[i].id);
+      let cursor = 0;
+      const worker = async () => {
+        while (!dead && cursor < todo.length) {
+          const i = todo[cursor++];
+          const m = await scMeta(sounds[i].id);
+          if (m) mergeSound(i, m);
+        }
+      };
+      await Promise.all([worker(), worker(), worker()]);
+    }
+
+    function gotSounds(found) {
+      sounds = found.slice();
       W.getCurrentSoundIndex((i) => {
         idx = typeof i === 'number' && i >= 0 && i < sounds.length ? i : 0;
         renderTracks();
         els.play.disabled = false;
         els.seek.disabled = false;
         showTrack();
+        if (stubs().length) hydrate();
       });
     }
 
@@ -1001,7 +1222,15 @@
         W.setVolume(vol);
         loadSounds(0);
       });
-      W.bind(E.PLAY, () => { setPlaying(true); syncIndex(); });
+      W.bind(E.PLAY, () => {
+        clearTimeout(playWatch);
+        setPlaying(true);
+        syncIndex();
+        if (autoRevealed) {
+          autoRevealed = false;
+          setTimeout(() => { if (!dead) { showOfficial(false); note.hidden = true; } }, 700);
+        }
+      });
       W.bind(E.PAUSE, () => setPlaying(false));
       W.bind(E.FINISH, () => { setPlaying(false); syncIndex(); });
       W.bind(E.PLAY_PROGRESS, (e) => {
@@ -1017,7 +1246,7 @@
       }, 12000);
     }
 
-    els.play.addEventListener('click', () => { if (W && ready) W.toggle(); });
+    els.play.addEventListener('click', () => { if (W && ready) requestPlay(() => W.toggle()); });
     els.next.addEventListener('click', () => { if (W && ready) W.next(); });
     els.prev.addEventListener('click', () => { if (W && ready) W.prev(); });
 
@@ -1041,7 +1270,130 @@
     return {
       root, official, foot, start,
       pause() { try { if (W && ready) W.pause(); } catch {} },
-      destroy() { dead = true; clearTimeout(readyTimer); this.pause(); }
+      destroy() { dead = true; clearTimeout(readyTimer); clearTimeout(playWatch); this.pause(); }
+    };
+  }
+
+  /* ───────────────── Spotify: status + seek on top of the official embed ───────────────── */
+  let spApiPromise = null;
+  function loadSpotifyApi() {
+    if (window.__spApi) return Promise.resolve(window.__spApi);
+    if (!spApiPromise) {
+      spApiPromise = new Promise((resolve, reject) => {
+        const timer = setTimeout(() => { spApiPromise = null; reject(new Error('timeout')); }, 8000);
+        window.onSpotifyIframeApiReady = (api) => { clearTimeout(timer); window.__spApi = api; resolve(api); };
+        const sc = document.createElement('script');
+        sc.src = 'https://open.spotify.com/embed/iframe-api/v1';
+        sc.async = true;
+        sc.onerror = () => { clearTimeout(timer); spApiPromise = null; reject(new Error('blocked')); };
+        document.head.append(sc);
+      });
+    }
+    return spApiPromise;
+  }
+
+  const SP_TEMPLATE = `
+    <div class="np">
+      <div class="art" data-art></div>
+      <div class="np-text">
+        <div class="np-title" data-title dir="auto"></div>
+        <div class="np-artist" data-artist dir="auto"></div>
+      </div>
+    </div>
+    <div class="seek">
+      <span class="time" data-pos>0:00</span>
+      <input class="range" type="range" min="0" max="1000" value="0" data-seek aria-label="جلو و عقب کردن" disabled>
+      <span class="time" data-dur>0:00</span>
+    </div>
+    <p class="sp-hint">برای پخش، دکمه‌ی پلی توی پلیر اسپاتیفای پایین رو بزن. صدا رو هم با دکمه‌های خود گوشی یا سیستم تنظیم کن؛ اسپاتیفای کنترل صدا نمی‌ده.</p>`;
+
+  function createSpPlayer(item, api, { onPlaying }) {
+    const root = document.createElement('div');
+    root.className = 'cp';
+    root.innerHTML = SP_TEMPLATE;
+    const q = (s) => root.querySelector(s);
+    const els = {
+      art: q('[data-art]'), title: q('[data-title]'), artist: q('[data-artist]'),
+      pos: q('[data-pos]'), dur: q('[data-dur]'), seek: q('[data-seek]')
+    };
+    const host = document.createElement('div');
+    host.className = 'sp-embed';
+    const placeholder = document.createElement('div');
+    host.append(placeholder);
+    root.append(host);
+
+    let C = null, dead = false, ready = false, playing = false, currentUri = null, dur = 0, dragging = false;
+    let containerTitle = item.title;
+    const typeLine = `${TYPES[item.type] || ''} از اسپاتیفای`;
+    const isCollection = /^(playlist|album|artist|show)$/.test(item.type);
+
+    els.title.textContent = item.title;
+    els.artist.textContent = typeLine;
+    fillRange(els.seek);
+
+    spotifyMeta(item.url).then((m) => {
+      if (dead || !m) return;
+      if (m.title) containerTitle = m.title;
+      if (!currentUri) {
+        if (m.title) els.title.textContent = m.title;
+        makeArt(els.art, m.thumb);
+      }
+    });
+
+    function trackChanged(uri) {
+      const m = /^spotify:(track|episode):([A-Za-z0-9]+)/.exec(uri || '');
+      if (!m || uri === currentUri) return;
+      currentUri = uri;
+      spotifyMeta(`https://open.spotify.com/${m[1]}/${m[2]}`).then((meta) => {
+        if (dead || currentUri !== uri) return;
+        if (!meta) { els.artist.textContent = 'اسم آهنگ رو توی پلیر پایین ببین'; return; }
+        if (meta.title) els.title.textContent = meta.title;
+        makeArt(els.art, meta.thumb);
+        els.artist.textContent = isCollection ? containerTitle : typeLine;
+      });
+    }
+
+    function start() {
+      const height = (item.type === 'track' || item.type === 'episode') ? 152 : 352;
+      api.createController(placeholder, { uri: `spotify:${item.type}:${item.id}`, width: '100%', height }, (ctrl) => {
+        if (dead) { try { ctrl.destroy(); } catch {} return; }
+        C = ctrl;
+        ctrl.addListener('ready', () => { ready = true; });
+        ctrl.addListener('playback_started', (e) => trackChanged(e && e.data && e.data.playingURI));
+        ctrl.addListener('playback_update', (e) => {
+          const d = e && e.data;
+          if (!d) return;
+          trackChanged(d.playingURI);
+          dur = Number(d.duration) || 0;
+          const pos = Number(d.position) || 0;
+          els.dur.textContent = fmt(dur);
+          els.seek.disabled = !dur;
+          if (!dragging) {
+            els.pos.textContent = fmt(pos);
+            els.seek.value = dur ? Math.round(Math.min(1, pos / dur) * 1000) : 0;
+            fillRange(els.seek);
+          }
+          const p = d.isPaused === false;
+          if (p !== playing) { playing = p; onPlaying(p); }
+        });
+      });
+    }
+
+    els.seek.addEventListener('input', () => {
+      dragging = true;
+      fillRange(els.seek);
+      els.pos.textContent = fmt(Number(els.seek.value) / 1000 * dur);
+    });
+    els.seek.addEventListener('change', () => {
+      if (C && dur) { try { C.seek(Math.round(Number(els.seek.value) / 1000 * dur / 1000)); } catch {} }
+      dragging = false;
+    });
+
+    return {
+      root, start,
+      isReady: () => ready,
+      pause() { try { if (C) C.pause(); } catch {} },
+      destroy() { dead = true; this.pause(); }
     };
   }
 
@@ -1063,15 +1415,31 @@
     fallback.hidden = false;
   }
 
-  function mountSpotify(item) {
-    const frame = buildFrame(item);
-    let loaded = false;
-    frame.addEventListener('load', () => { loaded = true; });
-    player.replaceChildren(frame);
-    caption.textContent = SPOTIFY_NOTE;
+  function mountSpotifyPlain(item, note) {
+    player.replaceChildren(buildFrame(item));
+    caption.textContent = note || SPOTIFY_NOTE;
     stage.classList.add('spin');
+  }
+
+  async function mountSpotify(item, token) {
+    stage.classList.remove('spin');
+    caption.textContent = SPOTIFY_NOTE;
     showFallback(item, false);
-    setTimeout(() => { if (!loaded && currentKey === item.key) showFallback(item, true); }, 10000);
+    let api;
+    try {
+      api = await loadSpotifyApi();
+    } catch {
+      if (token === mountToken) mountSpotifyPlain(item, 'پلیر اسپاتیفای بدون قابلیت‌های اضافه لود شد. ' + SPOTIFY_NOTE);
+      return;
+    }
+    if (token !== mountToken) return;
+    const sp = createSpPlayer(item, api, {
+      onPlaying: (p) => { if (token === mountToken) stage.classList.toggle('spin', p); }
+    });
+    active = sp;
+    player.replaceChildren(sp.root);
+    sp.start();
+    setTimeout(() => { if (token === mountToken && !sp.isReady()) showFallback(item, true); }, 10000);
   }
 
   function mountOfficialOnly(item, note) {
@@ -1095,7 +1463,7 @@
     const sc = createScPlayer(item, {
       onPlaying: (p) => { if (token === mountToken) stage.classList.toggle('spin', p); }
     });
-    activeSc = sc;
+    active = sc;
     player.replaceChildren(sc.root, sc.official, sc.foot);
     sc.start();
   }
@@ -1105,17 +1473,17 @@
     write(LS_LAST, currentKey);
     const token = ++mountToken;
     render();
-    if (activeSc) { activeSc.pause(); }
+    if (active) active.pause();
 
     const mount = () => {
       if (token !== mountToken) return;
-      if (activeSc) { activeSc.destroy(); activeSc = null; }
+      if (active) { active.destroy(); active = null; }
       setTheme(item.source);
       empty.hidden = true;
       caption.textContent = '';
       fallback.hidden = true;
       stage.classList.add('out');
-      if (item.source === 'spotify') mountSpotify(item);
+      if (item.source === 'spotify') mountSpotify(item, token);
       else mountSoundCloud(item, token);
     };
 
@@ -1128,19 +1496,14 @@
     }
   }
 
-  /* ── titles (best effort; falls back to a generic name) ── */
+  /* ── titles for the library (best effort; falls back to a generic name) ── */
   async function fetchTitle(item) {
-    const url = item.source === 'spotify'
-      ? 'https://open.spotify.com/oembed?url=' + encodeURIComponent(item.url)
-      : 'https://soundcloud.com/oembed?format=json&url=' + encodeURIComponent(item.url);
-    const ctrl = new AbortController();
-    const t = setTimeout(() => ctrl.abort(), 6000);
-    try {
-      const r = await fetch(url, { signal: ctrl.signal });
-      if (!r.ok) return null;
-      const j = await r.json();
-      return (j.title || '').trim() || null;
-    } catch { return null; } finally { clearTimeout(t); }
+    if (item.source === 'spotify') {
+      const m = await spotifyMeta(item.url);
+      return m && m.title ? m.title : null;
+    }
+    const j = await getJson('https://soundcloud.com/oembed?format=json&url=' + encodeURIComponent(item.url), 6000);
+    return j && j.title ? String(j.title).trim() || null : null;
   }
 
   const persist = () => write(LS_LIB, library);
@@ -1254,6 +1617,7 @@
     persist();
     play(item);
     input.value = '';
+    input.blur();
   });
 
   input.addEventListener('input', () => { if (msg.classList.contains('error')) say(DEFAULT_HINT, false); });
@@ -1268,6 +1632,7 @@
   const last = library.find((i) => i.key === currentKey);
   if (last) play(last);
 })();
+
 </script>
 </body>
 </html>

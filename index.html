@@ -1,0 +1,1273 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>گرامافون</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lalezar&family=Vazirmatn:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%92%BF%3C/text%3E%3C/svg%3E">
+<style>
+  /* ───────── themes: purple (idle) · green (Spotify) · orange (SoundCloud) ───────── */
+  :root {
+    --bg: #120a1a;
+    --surface: #1b1026;
+    --surface-2: #2a1a3a;
+    --surface-focus: #20132d;
+    --line: #3d2954;
+    --line-hover: #5a3f7a;
+    --accent: #ffb454;
+    --on-accent: #1b1026;
+    --text: #f4ebe1;
+    --muted: #b9a9c9;
+    --dim: #8d7ea1;
+    --groove-a: #1b1324;
+    --groove-b: #0a050f;
+    --ring: #07030b;
+    --danger: #ff8a8a;
+  }
+  html[data-theme="spotify"] {
+    --bg: #07130c;
+    --surface: #0d2016;
+    --surface-2: #163625;
+    --surface-focus: #102a1c;
+    --line: #21503a;
+    --line-hover: #2f7050;
+    --accent: #1ed760;
+    --on-accent: #06180d;
+    --muted: #a8c7b5;
+    --dim: #76a189;
+    --groove-a: #10251a;
+    --groove-b: #040b07;
+    --ring: #020604;
+  }
+  html[data-theme="soundcloud"] {
+    --bg: #170a04;
+    --surface: #26120a;
+    --surface-2: #3b1d0e;
+    --surface-focus: #2e170c;
+    --line: #5e2d15;
+    --line-hover: #8c4523;
+    --accent: #ff5500;
+    --on-accent: #190800;
+    --muted: #d6b9a6;
+    --dim: #a5836f;
+    --groove-a: #261309;
+    --groove-b: #0c0502;
+    --ring: #060200;
+  }
+
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+
+  html { color-scheme: dark; }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Vazirmatn', Tahoma, 'Segoe UI', system-ui, sans-serif;
+    font-size: 16px;
+    line-height: 1.8;
+    -webkit-font-smoothing: antialiased;
+    transition: background-color .7s ease;
+  }
+
+  button, input { font: inherit; color: inherit; }
+
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+
+  .page {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 24px 24px 64px;
+  }
+
+  /* ───────── header ───────── */
+  .top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'Lalezar', 'Vazirmatn', Tahoma, sans-serif;
+    font-size: 1.5rem;
+  }
+  .brand svg { width: 28px; height: 28px; }
+  .brand .b-disc { fill: var(--groove-b); stroke: var(--line); }
+  .brand .b-ring { fill: none; stroke: var(--surface-2); }
+  .brand .b-label { fill: var(--accent); }
+  .brand .b-hole { fill: var(--bg); }
+
+  .social { display: flex; flex-wrap: wrap; gap: 8px; }
+  .social a {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 14px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    color: var(--muted);
+    font-size: .875rem;
+    text-decoration: none;
+    transition: color .15s, border-color .15s;
+  }
+  .social a:hover { color: var(--accent); border-color: var(--accent); }
+  .social svg { width: 16px; height: 16px; flex: none; }
+
+  /* ───────── hero + form ───────── */
+  .hero { max-width: 720px; margin-top: 40px; }
+
+  h1 {
+    margin: 0;
+    font-family: 'Lalezar', 'Vazirmatn', Tahoma, sans-serif;
+    font-weight: 400;
+    font-size: clamp(2.5rem, 7vw, 4.4rem);
+    line-height: 1.2;
+    letter-spacing: 0;
+  }
+
+  .lead { margin: 12px 0 28px; max-width: 56ch; color: var(--muted); }
+
+  .field { display: flex; gap: 10px; }
+
+  .field input {
+    flex: 1;
+    min-width: 0;
+    padding: 14px 18px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    transition: border-color .15s, background-color .4s;
+  }
+  .field input::placeholder { color: var(--dim); }
+  .field input:hover { border-color: var(--line-hover); }
+  .field input:focus { outline: none; border-color: var(--accent); background: var(--surface-focus); }
+
+  .field button {
+    padding: 0 28px;
+    border: 0;
+    border-radius: 14px;
+    background: var(--accent);
+    color: var(--on-accent);
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform .12s, filter .15s, background-color .4s;
+  }
+  .field button:hover { filter: brightness(1.08); }
+  .field button:active { transform: translateY(1px); }
+
+  .hint { margin: 10px 4px 0; font-size: .875rem; color: var(--muted); min-height: 1.6em; }
+  .hint.error { color: var(--danger); }
+
+  /* ───────── layout ───────── */
+  .layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 300px;
+    gap: 40px;
+    margin-top: 40px;
+    align-items: start;
+  }
+
+  /* ───────── stage: record rising out of the sleeve ───────── */
+  .stage {
+    --size: min(300px, 62vw);
+    position: relative;
+    padding-top: 8px;
+  }
+
+  .stage::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: calc(var(--size) * 1.7);
+    height: calc(var(--size) * 1.1);
+    transform: translateX(-50%);
+    background: radial-gradient(closest-side, color-mix(in srgb, var(--accent) 30%, transparent), transparent);
+    opacity: 0;
+    transition: opacity 1s .3s;
+    pointer-events: none;
+  }
+  .stage.out::before { opacity: 1; }
+
+  .record-clip {
+    position: relative;
+    z-index: 0;
+    width: var(--size);
+    height: calc(var(--size) * .56);
+    margin: 0 auto;
+    overflow: hidden;
+  }
+
+  .record-slide {
+    position: relative;
+    width: var(--size);
+    height: var(--size);
+    transform: translateY(102%);
+    transition: transform .9s cubic-bezier(.2, .8, .2, 1);
+  }
+  .stage.out .record-slide { transform: none; }
+
+  .record {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background:
+      conic-gradient(from 0deg, transparent 0 6%, rgba(255,255,255,.07) 9%, transparent 14% 52%, rgba(255,255,255,.05) 55%, transparent 60%),
+      repeating-radial-gradient(circle at center, var(--groove-a) 0 1.5px, var(--groove-b) 1.5px 3.5px);
+    box-shadow: 0 0 0 2px var(--ring);
+    animation: spin 9s linear infinite;
+    animation-play-state: paused;
+  }
+  .stage.spin .record { animation-play-state: running; }
+
+  .record .label {
+    position: absolute;
+    inset: 33%;
+    border-radius: 50%;
+    background: conic-gradient(rgba(0,0,0,0) 0 50%, rgba(0,0,0,.24) 50% 100%), var(--accent);
+    box-shadow: 0 0 0 3px var(--ring);
+  }
+  .record .mark {
+    position: absolute;
+    top: 12%;
+    left: 50%;
+    width: 8%;
+    aspect-ratio: 1;
+    transform: translateX(-50%);
+    border-radius: 50%;
+    background: rgba(255,255,255,.8);
+  }
+  .record .hole {
+    position: absolute;
+    inset: 47.5%;
+    border-radius: 50%;
+    background: var(--bg);
+  }
+
+  /* static reflection so the light doesn't spin with the record */
+  .record-slide::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    pointer-events: none;
+    background: conic-gradient(from 25deg, transparent 0 8%, rgba(255,255,255,.11) 12%, transparent 18% 58%, rgba(255,255,255,.08) 62%, transparent 68%);
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .sleeve {
+    position: relative;
+    z-index: 1;
+    padding: 14px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 22px;
+    box-shadow: 0 30px 60px -30px rgba(0,0,0,.7);
+    transition: background-color .7s, border-color .7s;
+  }
+
+  .player { position: relative; border-radius: 14px; overflow: hidden; }
+  .player iframe { display: block; width: 100%; border: 0; }
+
+  .empty {
+    display: grid;
+    place-items: center;
+    gap: 6px;
+    padding: 52px 24px;
+    text-align: center;
+  }
+  .empty strong {
+    font-family: 'Lalezar', 'Vazirmatn', Tahoma, sans-serif;
+    font-weight: 400;
+    font-size: 1.6rem;
+  }
+  .empty span { max-width: 36ch; color: var(--muted); }
+
+  .caption { margin: 14px 6px 0; font-size: .875rem; color: var(--muted); min-height: 1.4em; }
+  .caption a { color: var(--accent); text-underline-offset: 3px; }
+  .caption .warn { color: var(--danger); }
+
+  .notice {
+    margin: 0 0 24px;
+    padding: 12px 16px;
+    background: #3a1d2b;
+    border: 1px solid #7a3550;
+    border-radius: 14px;
+    color: var(--text);
+    font-size: .9375rem;
+  }
+
+  /* ───────── custom SoundCloud player ───────── */
+  .cp { padding: 6px 6px 2px; }
+
+  .np { display: flex; align-items: center; gap: 16px; }
+  .art {
+    flex: none;
+    width: 84px;
+    height: 84px;
+    border-radius: 14px;
+    overflow: hidden;
+    background: var(--surface-2);
+  }
+  .art img { display: block; width: 100%; height: 100%; object-fit: cover; }
+
+  .np-text { min-width: 0; display: grid; gap: 0; }
+  .np-title {
+    font-weight: 700;
+    font-size: 1.0625rem;
+    line-height: 1.6;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .np-artist { color: var(--muted); font-size: .9375rem; line-height: 1.6; }
+  .np-link { justify-self: start; font-size: .8125rem; color: var(--accent); text-underline-offset: 3px; }
+
+  .seek {
+    display: grid;
+    grid-template-columns: 44px 1fr 44px;
+    align-items: center;
+    gap: 12px;
+    margin-top: 20px;
+    direction: ltr;
+  }
+  .time { font-size: .8125rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .time:last-child { text-align: right; }
+
+  .range {
+    -webkit-appearance: none;
+    appearance: none;
+    display: block;
+    width: 100%;
+    height: 6px;
+    margin: 0;
+    border-radius: 6px;
+    background: linear-gradient(to right, var(--accent) var(--p, 0%), var(--line) var(--p, 0%));
+    cursor: pointer;
+  }
+  .range:disabled { cursor: default; opacity: .5; }
+  .range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px;
+    height: 14px;
+    border: 0;
+    border-radius: 50%;
+    background: var(--text);
+    box-shadow: 0 0 0 4px var(--surface);
+  }
+  .range::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+    border: 0;
+    border-radius: 50%;
+    background: var(--text);
+    box-shadow: 0 0 0 4px var(--surface);
+  }
+  .range::-moz-range-track { background: transparent; }
+
+  .controls {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    margin-top: 14px;
+    direction: ltr;
+  }
+  .pad { display: flex; align-items: center; gap: 14px; }
+
+  .cbtn {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    background: none;
+    border: 0;
+    border-radius: 50%;
+    color: var(--text);
+    cursor: pointer;
+    transition: background-color .15s, opacity .15s;
+  }
+  .cbtn:hover:not(:disabled) { background: rgba(255,255,255,.08); }
+  .cbtn:disabled { opacity: .35; cursor: default; }
+  .cbtn svg { width: 22px; height: 22px; }
+
+  .cbtn.play {
+    width: 60px;
+    height: 60px;
+    background: var(--accent);
+    color: var(--on-accent);
+  }
+  .cbtn.play:hover:not(:disabled) { background: var(--accent); filter: brightness(1.1); }
+  .cbtn.play svg { width: 26px; height: 26px; }
+  .cbtn.play .i-pause { display: none; }
+  .is-playing .cbtn.play .i-pause { display: block; }
+  .is-playing .cbtn.play .i-play { display: none; }
+
+  .vol { justify-self: end; display: flex; align-items: center; gap: 10px; color: var(--muted); }
+  .vol svg { width: 18px; height: 18px; flex: none; }
+  .vol .range { width: 88px; }
+
+  .tracks {
+    list-style: none;
+    margin: 18px 0 0;
+    padding: 0;
+    max-height: 264px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--line) transparent;
+  }
+  .track-btn {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 26px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 10px;
+    background: none;
+    border: 0;
+    border-radius: 10px;
+    text-align: start;
+    cursor: pointer;
+  }
+  .track-btn:hover { background: rgba(255,255,255,.05); }
+  .track.current .track-btn { background: var(--surface-2); }
+  .track-num { display: grid; place-items: center; font-size: .8125rem; color: var(--dim); }
+  .track-text { min-width: 0; display: grid; }
+  .track-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; line-height: 1.6; }
+  .track.current .track-title { color: var(--accent); font-weight: 500; }
+  .track-artist { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: .8125rem; color: var(--muted); line-height: 1.5; }
+  .track-time { font-size: .8125rem; color: var(--muted); direction: ltr; font-variant-numeric: tabular-nums; }
+
+  .eq { display: none; align-items: flex-end; gap: 2px; height: 14px; }
+  .eq i { display: block; width: 3px; height: 35%; background: var(--accent); border-radius: 1px; animation: eq .9s ease-in-out infinite alternate; }
+  .eq i:nth-child(2) { animation-delay: -.3s; }
+  .eq i:nth-child(3) { animation-delay: -.6s; }
+  @keyframes eq { to { height: 100%; } }
+  .tracks.playing .current .eq { display: flex; }
+  .tracks.playing .current .track-num b { display: none; }
+  .track-num b { font-weight: 400; }
+
+  /* the official SoundCloud iframe stays invisible: it only produces the sound */
+  .official iframe { display: block; width: 100%; border: 0; }
+  .official.off {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 166px;
+    overflow: hidden;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .foot { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 16px; margin: 12px 6px 2px; font-size: .8125rem; }
+  .foot .note { flex-basis: 100%; color: var(--danger); }
+  .linkbtn {
+    padding: 4px 0;
+    background: none;
+    border: 0;
+    color: var(--muted);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    cursor: pointer;
+  }
+  .linkbtn:hover { color: var(--accent); }
+
+  /* ───────── library ───────── */
+  .library {
+    padding-inline-start: 28px;
+    border-inline-start: 1px solid var(--line);
+  }
+  .library h2 {
+    margin: 0 0 12px;
+    font-family: 'Lalezar', 'Vazirmatn', Tahoma, sans-serif;
+    font-weight: 400;
+    font-size: 1.6rem;
+  }
+
+  .list { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+
+  .item { position: relative; display: flex; align-items: center; border-radius: 12px; }
+  .item.active { background: var(--surface-2); }
+  .item.active::before {
+    content: '';
+    position: absolute;
+    inset-inline-start: 0;
+    top: 12px;
+    bottom: 12px;
+    width: 3px;
+    border-radius: 3px;
+    background: var(--accent);
+  }
+
+  .item-main {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    background: none;
+    border: 0;
+    border-radius: 12px;
+    text-align: start;
+    cursor: pointer;
+  }
+  .item:not(.active) .item-main:hover { background: rgba(255,255,255,.04); }
+
+  .src-dot { flex: none; width: 10px; height: 10px; border-radius: 50%; }
+  .item-text { min-width: 0; display: grid; }
+  .item-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 500; }
+  .item-meta { font-size: .8125rem; color: var(--muted); line-height: 1.5; }
+
+  .icon-btn {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    background: none;
+    border: 0;
+    border-radius: 8px;
+    color: var(--muted);
+    cursor: pointer;
+    transition: color .15s, background-color .15s;
+  }
+  .icon-btn:hover { color: var(--text); background: rgba(255,255,255,.08); }
+  .icon-btn.danger:hover { color: var(--danger); }
+  .icon-btn svg { width: 16px; height: 16px; }
+  .item-actions { display: flex; padding-inline-end: 6px; }
+
+  .lib-empty { margin: 0; color: var(--muted); font-size: .9375rem; }
+  .lib-note { margin: 18px 0 0; font-size: .8125rem; color: var(--dim); }
+
+  /* ───────── responsive ───────── */
+  @media (max-width: 900px) {
+    .layout { grid-template-columns: minmax(0, 1fr); gap: 48px; }
+    .library { padding-inline-start: 0; border-inline-start: 0; padding-top: 28px; border-top: 1px solid var(--line); }
+  }
+  @media (max-width: 520px) {
+    .page { padding: 18px 16px 48px; }
+    .field { flex-wrap: wrap; }
+    .field button { width: 100%; padding: 13px; }
+    .sleeve { padding: 10px; border-radius: 18px; }
+    .art { width: 68px; height: 68px; }
+    .vol .range { width: 64px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .record, .eq i { animation: none; }
+    .record-slide, .stage::before, body { transition: none; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <p id="preview-warning" class="notice" role="alert" hidden>
+    این صفحه الان داخل پیش‌نمایش باز شده و پلیرها توی پیش‌نمایش لود نمی‌شن.
+    فایل رو دانلود کن و مستقیم توی Chrome یا Firefox باز کن.
+  </p>
+
+  <header class="top">
+    <span class="brand">
+      <svg viewBox="0 0 32 32" aria-hidden="true">
+        <circle class="b-disc" cx="16" cy="16" r="15"/>
+        <circle class="b-ring" cx="16" cy="16" r="10" stroke-width="1"/>
+        <circle class="b-label" cx="16" cy="16" r="5.5"/>
+        <circle class="b-hole" cx="16" cy="16" r="1.4"/>
+      </svg>
+      گرامافون
+    </span>
+
+    <nav class="social" aria-label="راه‌های ارتباطی">
+      <a href="https://t.me/LeanAlien" target="_blank" rel="noopener noreferrer" title="تلگرام">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        <span dir="ltr">@LeanAlien</span>
+      </a>
+      <a href="https://instagram.com/Alienam_Edit" target="_blank" rel="noopener noreferrer" title="اینستاگرام">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+        <span dir="ltr">@Alienam_Edit</span>
+      </a>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <h1>لینک رو بچسبون، صدا رو بلند کن</h1>
+    <p class="lead">لینک پلی‌لیست ساندکلود یا اسپاتیفای رو این‌جا بذار تا پلیرش همین‌جا باز بشه.</p>
+
+    <form id="form" class="field" autocomplete="off" novalidate>
+      <input id="link" type="text" dir="auto" inputmode="url" spellcheck="false"
+             placeholder="لینک رو این‌جا بچسبون…" aria-label="لینک پلی‌لیست" aria-describedby="msg">
+      <button type="submit">پخش کن</button>
+    </form>
+    <p id="msg" class="hint" role="status">پلی‌لیست، آلبوم و ترک از ساندکلود و اسپاتیفای پشتیبانی می‌شه.</p>
+  </section>
+
+  <main class="layout">
+
+    <div class="stage" id="stage">
+      <div class="record-clip" aria-hidden="true">
+        <div class="record-slide">
+          <div class="record">
+            <div class="label"><span class="mark"></span></div>
+            <div class="hole"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sleeve">
+        <div id="empty" class="empty">
+          <strong>این‌جا هنوز ساکته</strong>
+          <span>یه لینک ساندکلود یا اسپاتیفای بالا بچسبون تا پلیرش این‌جا باز بشه.</span>
+        </div>
+        <div id="player" class="player"></div>
+      </div>
+      <p id="caption" class="caption"></p>
+      <p id="fallback" class="caption" hidden></p>
+    </div>
+
+    <aside class="library" aria-labelledby="lib-title">
+      <h2 id="lib-title">کتابخونه‌ی من</h2>
+      <ul id="list" class="list"></ul>
+      <p id="lib-empty" class="lib-empty">بعد از اولین پخش، لینک‌ها این‌جا ذخیره می‌شن.</p>
+      <p class="lib-note">لینک‌ها فقط توی همین مرورگر ذخیره می‌شن.</p>
+    </aside>
+
+  </main>
+</div>
+
+<script>
+(() => {
+  const $ = (s) => document.querySelector(s);
+  const form = $('#form'), input = $('#link'), msg = $('#msg');
+  const stage = $('#stage'), player = $('#player'), empty = $('#empty'), caption = $('#caption');
+  const list = $('#list'), libEmpty = $('#lib-empty'), fallback = $('#fallback');
+
+  // opened inside a preview frame instead of directly in the browser
+  if (window.self !== window.top) $('#preview-warning').hidden = false;
+
+  const DEFAULT_HINT = 'پلی‌لیست، آلبوم و ترک از ساندکلود و اسپاتیفای پشتیبانی می‌شه.';
+  const SPOTIFY_NOTE = 'برای پخش کامل، توی همین مرورگر وارد اکانت اسپاتیفایت شو؛ وگرنه فقط ۳۰ ثانیه‌ی اول هر آهنگ پخش می‌شه.';
+  const SOURCES = {
+    spotify:    { name: 'اسپاتیفای', color: '#1DB954' },
+    soundcloud: { name: 'ساندکلود',  color: '#FF5500' }
+  };
+  const TYPES = {
+    playlist: 'پلی‌لیست', album: 'آلبوم', track: 'ترک', artist: 'خواننده',
+    show: 'پادکست', episode: 'اپیزود', set: 'پلی‌لیست', profile: 'پروفایل', link: 'لینک'
+  };
+  const LS_LIB = 'gramafon:library', LS_LAST = 'gramafon:last', LS_VOL = 'gramafon:volume';
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ── storage (safe when the browser blocks it) ── */
+  const read = (k, fallbackValue) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : fallbackValue; } catch { return fallbackValue; } };
+  const write = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} };
+
+  let library = read(LS_LIB, []);
+  if (!Array.isArray(library)) library = [];
+  library = library.filter((i) => i && i.key && i.url && SOURCES[i.source]);
+  let currentKey = read(LS_LAST, null);
+  let swapTimer = null;
+  let mountToken = 0;
+  let activeSc = null;
+
+  const setTheme = (source) => { document.documentElement.dataset.theme = source || ''; };
+  const fmt = (ms) => {
+    const t = Math.max(0, Math.floor((ms || 0) / 1000));
+    const h = Math.floor(t / 3600), m = Math.floor((t % 3600) / 60), s = t % 60;
+    return (h ? `${h}:${String(m).padStart(2, '0')}` : `${m}`) + ':' + String(s).padStart(2, '0');
+  };
+  const isHttps = (u) => typeof u === 'string' && /^https:\/\//i.test(u);
+
+  /* ── link parsing ── */
+  const SC_SYSTEM = new Set(['discover', 'you', 'stream', 'feed', 'search', 'upload', 'charts', 'messages', 'notifications', 'settings', 'pages', 'popular', 'people']);
+  const SC_TABS = new Set(['likes', 'tracks', 'reposts', 'albums', 'sets', 'popular-tracks', 'comments', 'following', 'followers']);
+
+  function parseLink(raw) {
+    const s = (raw || '').trim();
+    if (!s) return null;
+
+    let m = s.match(/^spotify:(playlist|album|track|artist|show|episode):([A-Za-z0-9]+)/);
+    if (m) return { source: 'spotify', type: m[1], id: m[2], url: `https://open.spotify.com/${m[1]}/${m[2]}` };
+
+    let u;
+    try { u = new URL(/^https?:\/\//i.test(s) ? s : 'https://' + s); } catch { return null; }
+    const host = u.hostname.replace(/^www\./, '').toLowerCase();
+
+    if (host === 'open.spotify.com') {
+      const parts = u.pathname.split('/').filter(Boolean).filter((p) => !/^intl-/i.test(p));
+      if (parts[0] === 'embed') parts.shift();
+      const [type, id] = parts;
+      if (/^(playlist|album|track|artist|show|episode)$/.test(type || '') && /^[A-Za-z0-9]+$/.test(id || '')) {
+        return { source: 'spotify', type, id, url: `https://open.spotify.com/${type}/${id}` };
+      }
+      return null;
+    }
+
+    if (host === 'soundcloud.com' || host === 'm.soundcloud.com' || host === 'on.soundcloud.com') {
+      const parts = u.pathname.split('/').filter(Boolean);
+      if (!parts.length) return null;
+      const h = host === 'm.soundcloud.com' ? 'soundcloud.com' : host;
+      if (h === 'on.soundcloud.com') return { source: 'soundcloud', type: 'link', url: `https://${h}${u.pathname}` };
+      if (SC_SYSTEM.has(parts[0])) return { error: 'system' };
+      const secret = u.searchParams.get('secret_token');
+      const tail = secret ? `?secret_token=${encodeURIComponent(secret)}` : '';
+      let path = parts;
+      if (parts.length === 2 && SC_TABS.has(parts[1])) path = [parts[0]];
+      let type = 'track';
+      if (path.includes('sets')) type = 'set';
+      else if (path.length === 1) type = 'profile';
+      return { source: 'soundcloud', type, url: `https://soundcloud.com/${path.join('/')}${tail}` };
+    }
+    return null;
+  }
+
+  /* ── on.soundcloud.com short links → real embeddable URL (best effort) ── */
+  async function resolveShort(p) {
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), 8000);
+    try {
+      const r = await fetch('https://soundcloud.com/oembed?format=json&url=' + encodeURIComponent(p.url), { signal: ctrl.signal });
+      if (!r.ok) return null;
+      const j = await r.json();
+      const m = /src="([^"]+)"/.exec(j.html || '');
+      if (!m) return null;
+      const embedded = new URL(m[1].replace(/&amp;/g, '&')).searchParams.get('url');
+      if (!embedded) return null;
+      const type = /\/playlists\//.test(embedded) ? 'set' : /\/users\//.test(embedded) ? 'profile' : 'track';
+      return { source: 'soundcloud', type, url: embedded, openUrl: p.url, title: (j.title || '').trim() || null };
+    } catch { return null; } finally { clearTimeout(t); }
+  }
+
+  /* ── official iframes ── */
+  function buildFrame(item, visual) {
+    const f = document.createElement('iframe');
+    f.allow = 'autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture';
+    f.allowFullscreen = true;
+    f.title = item.title || 'پلیر';
+
+    if (item.source === 'spotify') {
+      f.src = `https://open.spotify.com/embed/${item.type}/${item.id}?utm_source=generator&theme=0`;
+      f.style.height = ((item.type === 'track' || item.type === 'episode') ? 152 : 380) + 'px';
+    } else {
+      const compact = item.type === 'track';
+      const q = new URLSearchParams({
+        url: item.url, color: '#ff5500', auto_play: 'false', hide_related: 'true',
+        show_comments: 'false', show_user: 'true', show_reposts: 'false', show_teaser: 'false',
+        visual: (visual && !compact) ? 'true' : 'false'
+      });
+      f.src = `https://w.soundcloud.com/player/?${q}`;
+      f.style.height = (compact ? 166 : 380) + 'px';
+    }
+    return f;
+  }
+
+  /* ── SoundCloud Widget API (loaded on demand) ── */
+  let scApiPromise = null;
+  function loadScApi() {
+    if (window.SC && window.SC.Widget) return Promise.resolve();
+    if (!scApiPromise) {
+      scApiPromise = new Promise((resolve, reject) => {
+        const timer = setTimeout(() => { scApiPromise = null; reject(new Error('timeout')); }, 8000);
+        const s = document.createElement('script');
+        s.src = 'https://w.soundcloud.com/player/api.js';
+        s.onload = () => { clearTimeout(timer); resolve(); };
+        s.onerror = () => { clearTimeout(timer); scApiPromise = null; reject(new Error('blocked')); };
+        document.head.append(s);
+      });
+    }
+    return scApiPromise;
+  }
+
+  const svg = (inner, extra = '') =>
+    `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ${extra}>${inner}</svg>`;
+
+  const CP_TEMPLATE = `
+    <div class="np">
+      <div class="art" data-art></div>
+      <div class="np-text">
+        <div class="np-title" data-title dir="auto"></div>
+        <div class="np-artist" data-artist dir="auto"></div>
+        <a class="np-link" data-link target="_blank" rel="noopener noreferrer" hidden>مشاهده توی ساندکلود</a>
+      </div>
+    </div>
+    <div class="seek">
+      <span class="time" data-pos>0:00</span>
+      <input class="range" type="range" min="0" max="1000" value="0" data-seek aria-label="جلو و عقب کردن" disabled>
+      <span class="time" data-dur>0:00</span>
+    </div>
+    <div class="controls">
+      <span></span>
+      <div class="pad">
+        <button type="button" class="cbtn" data-prev aria-label="قبلی" disabled>${svg('<polygon points="19 20 9 12 19 4 19 20" fill="currentColor"/><line x1="5" y1="19" x2="5" y2="5"/>')}</button>
+        <button type="button" class="cbtn play" data-play aria-label="پخش" disabled>
+          ${svg('<polygon points="6 4 20 12 6 20 6 4" fill="currentColor"/>', 'class="i-play"')}
+          ${svg('<rect x="6" y="4" width="4" height="16" fill="currentColor"/><rect x="14" y="4" width="4" height="16" fill="currentColor"/>', 'class="i-pause"')}
+        </button>
+        <button type="button" class="cbtn" data-next aria-label="بعدی" disabled>${svg('<polygon points="5 4 15 12 5 20 5 4" fill="currentColor"/><line x1="19" y1="5" x2="19" y2="19"/>')}</button>
+      </div>
+      <label class="vol">
+        ${svg('<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M19 5a10 10 0 0 1 0 14"/>')}
+        <input class="range" type="range" min="0" max="100" data-vol aria-label="صدا">
+      </label>
+    </div>
+    <ol class="tracks" data-tracks hidden></ol>`;
+
+  const fillRange = (el) => el.style.setProperty('--p', (Number(el.value) / Number(el.max) * 100) + '%');
+
+  function createScPlayer(item, { onPlaying }) {
+    const root = document.createElement('div');
+    root.className = 'cp';
+    root.innerHTML = CP_TEMPLATE;
+    const q = (s) => root.querySelector(s);
+    const els = {
+      art: q('[data-art]'), title: q('[data-title]'), artist: q('[data-artist]'), link: q('[data-link]'),
+      seek: q('[data-seek]'), pos: q('[data-pos]'), dur: q('[data-dur]'),
+      prev: q('[data-prev]'), play: q('[data-play]'), next: q('[data-next]'),
+      vol: q('[data-vol]'), tracks: q('[data-tracks]')
+    };
+
+    // The official widget stays invisible and only produces the sound.
+    const frame = buildFrame(item, false);
+    const official = document.createElement('div');
+    official.className = 'official off';
+    official.append(frame);
+
+    const foot = document.createElement('div');
+    foot.className = 'foot';
+    const note = document.createElement('span');
+    note.className = 'note';
+    note.hidden = true;
+    const toggle = document.createElement('button');
+    toggle.type = 'button';
+    toggle.className = 'linkbtn';
+    toggle.textContent = 'نمایش پلیر اصلی ساندکلود';
+    foot.append(note, toggle);
+
+    let W = null, ready = false, dead = false, readyTimer = null;
+    let sounds = [], idx = 0, dur = 0, dragging = false;
+    let vol = Number(read(LS_VOL, 80));
+    if (!(vol >= 0 && vol <= 100)) vol = 80;
+    els.vol.value = vol;
+    fillRange(els.vol);
+    fillRange(els.seek);
+    els.title.textContent = 'در حال آماده‌سازی…';
+
+    function showOfficial(visible) {
+      official.classList.toggle('off', !visible);
+      root.hidden = visible;
+      toggle.textContent = visible ? 'برگشت به پلیر گرامافون' : 'نمایش پلیر اصلی ساندکلود';
+    }
+    toggle.addEventListener('click', () => showOfficial(official.classList.contains('off')));
+
+    function fail(text) {
+      if (dead) return;
+      clearTimeout(readyTimer);
+      showOfficial(true);
+      note.textContent = text;
+      note.hidden = false;
+      onPlaying(false);
+    }
+
+    function setPlaying(p) {
+      root.classList.toggle('is-playing', p);
+      els.tracks.classList.toggle('playing', p);
+      els.play.setAttribute('aria-label', p ? 'توقف' : 'پخش');
+      onPlaying(p);
+    }
+
+    function showTrack() {
+      const s = sounds[idx];
+      els.title.textContent = s ? (s.title || '—') : 'در حال آماده‌سازی…';
+      els.artist.textContent = s && s.user ? (s.user.username || '') : '';
+      els.art.replaceChildren();
+      const artUrl = s && (s.artwork_url || (s.user && s.user.avatar_url));
+      if (isHttps(artUrl)) {
+        const img = new Image();
+        img.alt = '';
+        img.referrerPolicy = 'no-referrer';
+        img.onerror = () => img.remove();
+        img.src = artUrl.replace('-large.', '-t300x300.');
+        els.art.append(img);
+      }
+      if (s && isHttps(s.permalink_url)) { els.link.href = s.permalink_url; els.link.hidden = false; }
+      else els.link.hidden = true;
+      if (s && s.duration) dur = s.duration;
+      els.dur.textContent = fmt(dur);
+      [...els.tracks.children].forEach((li, i) => li.classList.toggle('current', i === idx));
+      const many = sounds.length > 1;
+      els.prev.disabled = !ready || !many;
+      els.next.disabled = !ready || !many;
+    }
+
+    function renderTracks() {
+      els.tracks.replaceChildren();
+      els.tracks.hidden = sounds.length < 2;
+      sounds.forEach((s, i) => {
+        const li = document.createElement('li');
+        li.className = 'track';
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'track-btn';
+
+        const num = document.createElement('span');
+        num.className = 'track-num';
+        const n = document.createElement('b');
+        n.textContent = String(i + 1);
+        const eq = document.createElement('span');
+        eq.className = 'eq';
+        eq.innerHTML = '<i></i><i></i><i></i>';
+        num.append(n, eq);
+
+        const text = document.createElement('span');
+        text.className = 'track-text';
+        const t = document.createElement('span');
+        t.className = 'track-title';
+        t.dir = 'auto';
+        t.textContent = s.title || '—';
+        const a = document.createElement('span');
+        a.className = 'track-artist';
+        a.dir = 'auto';
+        a.textContent = s.user ? (s.user.username || '') : '';
+        text.append(t, a);
+
+        const time = document.createElement('span');
+        time.className = 'track-time';
+        time.textContent = fmt(s.duration);
+
+        b.append(num, text, time);
+        b.addEventListener('click', () => { if (W && ready) { W.skip(i); W.play(); } });
+        li.append(b);
+        els.tracks.append(li);
+      });
+    }
+
+    function syncIndex() {
+      if (!W || !ready) return;
+      W.getCurrentSoundIndex((i) => {
+        if (typeof i === 'number' && i !== idx) { idx = i; showTrack(); }
+      });
+    }
+
+    function gotSounds(listOfSounds) {
+      sounds = listOfSounds;
+      W.getCurrentSoundIndex((i) => {
+        idx = typeof i === 'number' && i >= 0 && i < sounds.length ? i : 0;
+        renderTracks();
+        els.play.disabled = false;
+        els.seek.disabled = false;
+        showTrack();
+      });
+    }
+
+    function loadSounds(attempt) {
+      if (dead) return;
+      W.getSounds((found) => {
+        if (found && found.length) { gotSounds(found); return; }
+        W.getCurrentSound((s) => {
+          if (s) { gotSounds([s]); return; }
+          if (attempt < 3) setTimeout(() => loadSounds(attempt + 1), 800);
+          else fail('چیزی برای پخش پیدا نشد. پلیر اصلی رو نشون دادم تا دلیلش رو ببینی؛ ممکنه پلی‌لیست خصوصی باشه یا لینک نامعتبر باشه.');
+        });
+      });
+    }
+
+    function start() {
+      if (!window.SC || !window.SC.Widget) { fail('پلیر اختصاصی لود نشد. پلیر اصلی ساندکلود نمایش داده شد.'); return; }
+      W = window.SC.Widget(frame);
+      const E = window.SC.Widget.Events;
+
+      W.bind(E.READY, () => {
+        if (dead) return;
+        ready = true;
+        clearTimeout(readyTimer);
+        W.setVolume(vol);
+        loadSounds(0);
+      });
+      W.bind(E.PLAY, () => { setPlaying(true); syncIndex(); });
+      W.bind(E.PAUSE, () => setPlaying(false));
+      W.bind(E.FINISH, () => { setPlaying(false); syncIndex(); });
+      W.bind(E.PLAY_PROGRESS, (e) => {
+        if (dragging) return;
+        els.seek.value = Math.round((e.relativePosition || 0) * 1000);
+        fillRange(els.seek);
+        els.pos.textContent = fmt(e.currentPosition);
+      });
+      W.bind(E.ERROR, () => fail('ساندکلود نتونست این مورد رو پخش کنه. پلیر اصلی رو نشون دادم تا دلیلش رو ببینی.'));
+
+      readyTimer = setTimeout(() => {
+        if (!ready) fail('پلیر اختصاصی آماده نشد. پلیر اصلی رو نشون دادم تا خطاش رو ببینی؛ اگه پلی‌لیست خصوصیه لینک خصوصیش رو بذار، وگرنه اینترنت یا فیلترشکن رو چک کن.');
+      }, 12000);
+    }
+
+    els.play.addEventListener('click', () => { if (W && ready) W.toggle(); });
+    els.next.addEventListener('click', () => { if (W && ready) W.next(); });
+    els.prev.addEventListener('click', () => { if (W && ready) W.prev(); });
+
+    els.vol.addEventListener('input', () => {
+      vol = Number(els.vol.value);
+      fillRange(els.vol);
+      if (W && ready) W.setVolume(vol);
+      write(LS_VOL, vol);
+    });
+
+    els.seek.addEventListener('input', () => {
+      dragging = true;
+      fillRange(els.seek);
+      els.pos.textContent = fmt(Number(els.seek.value) / 1000 * dur);
+    });
+    els.seek.addEventListener('change', () => {
+      if (W && ready && dur) W.seekTo(Number(els.seek.value) / 1000 * dur);
+      dragging = false;
+    });
+
+    return {
+      root, official, foot, start,
+      pause() { try { if (W && ready) W.pause(); } catch {} },
+      destroy() { dead = true; clearTimeout(readyTimer); this.pause(); }
+    };
+  }
+
+  /* ── mounting a source into the sleeve ── */
+  function showFallback(item, notLoaded) {
+    fallback.replaceChildren();
+    if (notLoaded) {
+      const w = document.createElement('span');
+      w.className = 'warn';
+      w.textContent = 'پلیر هنوز لود نشده. اینترنت (یا فیلترشکن) رو چک کن. ';
+      fallback.append(w);
+    }
+    const a = document.createElement('a');
+    a.href = item.openUrl || item.url;
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+    a.textContent = 'باز کردن توی ' + SOURCES[item.source].name;
+    fallback.append(document.createTextNode(notLoaded ? '' : 'مشکل داری؟ '), a);
+    fallback.hidden = false;
+  }
+
+  function mountSpotify(item) {
+    const frame = buildFrame(item);
+    let loaded = false;
+    frame.addEventListener('load', () => { loaded = true; });
+    player.replaceChildren(frame);
+    caption.textContent = SPOTIFY_NOTE;
+    stage.classList.add('spin');
+    showFallback(item, false);
+    setTimeout(() => { if (!loaded && currentKey === item.key) showFallback(item, true); }, 10000);
+  }
+
+  function mountOfficialOnly(item, note) {
+    player.replaceChildren(buildFrame(item, true));
+    caption.textContent = note;
+    stage.classList.add('spin');
+  }
+
+  async function mountSoundCloud(item, token) {
+    stage.classList.remove('spin');
+    caption.textContent = 'در حال آماده‌سازی پلیر…';
+    showFallback(item, false);
+    try {
+      await loadScApi();
+    } catch {
+      if (token === mountToken) mountOfficialOnly(item, 'پلیر اختصاصی لود نشد (اینترنت یا فیلترشکن رو چک کن). پلیر اصلی ساندکلود نمایش داده شد.');
+      return;
+    }
+    if (token !== mountToken) return;
+    caption.textContent = '';
+    const sc = createScPlayer(item, {
+      onPlaying: (p) => { if (token === mountToken) stage.classList.toggle('spin', p); }
+    });
+    activeSc = sc;
+    player.replaceChildren(sc.root, sc.official, sc.foot);
+    sc.start();
+  }
+
+  function play(item) {
+    currentKey = item.key;
+    write(LS_LAST, currentKey);
+    const token = ++mountToken;
+    render();
+    if (activeSc) { activeSc.pause(); }
+
+    const mount = () => {
+      if (token !== mountToken) return;
+      if (activeSc) { activeSc.destroy(); activeSc = null; }
+      setTheme(item.source);
+      empty.hidden = true;
+      caption.textContent = '';
+      fallback.hidden = true;
+      stage.classList.add('out');
+      if (item.source === 'spotify') mountSpotify(item);
+      else mountSoundCloud(item, token);
+    };
+
+    clearTimeout(swapTimer);
+    if (stage.classList.contains('out') && !reduceMotion) {
+      stage.classList.remove('out', 'spin');   // record slides back in…
+      swapTimer = setTimeout(mount, 450);      // …then the new one comes out
+    } else {
+      mount();
+    }
+  }
+
+  /* ── titles (best effort; falls back to a generic name) ── */
+  async function fetchTitle(item) {
+    const url = item.source === 'spotify'
+      ? 'https://open.spotify.com/oembed?url=' + encodeURIComponent(item.url)
+      : 'https://soundcloud.com/oembed?format=json&url=' + encodeURIComponent(item.url);
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), 6000);
+    try {
+      const r = await fetch(url, { signal: ctrl.signal });
+      if (!r.ok) return null;
+      const j = await r.json();
+      return (j.title || '').trim() || null;
+    } catch { return null; } finally { clearTimeout(t); }
+  }
+
+  const persist = () => write(LS_LIB, library);
+  const defaultTitle = (p) => `${TYPES[p.type]} ${SOURCES[p.source].name}`;
+
+  /* ── library UI ── */
+  const ICON_EDIT = svg('<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/>');
+  const ICON_TRASH = svg('<path d="M3 6h18"/><path d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>');
+
+  function iconButton(icon, label, cls, onClick) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'icon-btn' + (cls ? ' ' + cls : '');
+    b.setAttribute('aria-label', label);
+    b.title = label;
+    b.innerHTML = icon;
+    b.addEventListener('click', onClick);
+    return b;
+  }
+
+  function render() {
+    list.replaceChildren();
+    libEmpty.hidden = library.length > 0;
+
+    library.forEach((item) => {
+      const li = document.createElement('li');
+      li.className = 'item' + (item.key === currentKey ? ' active' : '');
+
+      const main = document.createElement('button');
+      main.type = 'button';
+      main.className = 'item-main';
+      main.addEventListener('click', () => play(item));
+
+      const dot = document.createElement('span');
+      dot.className = 'src-dot';
+      dot.style.background = SOURCES[item.source].color;
+
+      const text = document.createElement('span');
+      text.className = 'item-text';
+      const title = document.createElement('span');
+      title.className = 'item-title';
+      title.dir = 'auto';
+      title.textContent = item.title;
+      const meta = document.createElement('span');
+      meta.className = 'item-meta';
+      meta.textContent = `${TYPES[item.type] || 'لینک'} از ${SOURCES[item.source].name}`;
+      text.append(title, meta);
+      main.append(dot, text);
+
+      const actions = document.createElement('span');
+      actions.className = 'item-actions';
+      actions.append(
+        iconButton(ICON_EDIT, 'تغییر نام', '', () => {
+          const n = prompt('اسم جدید:', item.title);
+          if (n && n.trim()) { item.title = n.trim(); item.auto = false; persist(); render(); }
+        }),
+        iconButton(ICON_TRASH, 'حذف از کتابخونه', 'danger', () => {
+          library = library.filter((i) => i !== item);
+          persist();
+          render();
+        })
+      );
+
+      li.append(main, actions);
+      list.append(li);
+    });
+  }
+
+  /* ── form ── */
+  function say(text, isError) {
+    msg.textContent = text;
+    msg.classList.toggle('error', !!isError);
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!input.value.trim()) { say('اول یه لینک بچسبون.', true); input.focus(); return; }
+
+    let parsed = parseLink(input.value);
+    if (!parsed) {
+      say('این لینک شبیه لینک ساندکلود یا اسپاتیفای نیست. لینک کامل رو از دکمه‌ی Share کپی کن.', true);
+      return;
+    }
+    if (parsed.error) {
+      say('این صفحه‌ی سیستمی ساندکلوده (مثل Discover یا Stream) و پلیر نداره. لینک یه پلی‌لیست یا ترک مشخص بذار.', true);
+      return;
+    }
+    if (parsed.type === 'link') {
+      say('در حال باز کردن لینک کوتاه…', false);
+      parsed = await resolveShort(parsed);
+      if (!parsed) {
+        say('لینک کوتاه ساندکلود رو نتونستم باز کنم. اون رو توی مرورگر باز کن و لینک کامل بالای صفحه رو کپی کن.', true);
+        return;
+      }
+    }
+    say(DEFAULT_HINT, false);
+
+    const key = `${parsed.source}|${parsed.url}`;
+    let item = library.find((i) => i.key === key);
+    if (item) {
+      library = [item, ...library.filter((i) => i !== item)];
+    } else {
+      item = { ...parsed, key, title: parsed.title || defaultTitle(parsed), auto: !parsed.title };
+      library.unshift(item);
+      if (item.auto) {
+        fetchTitle(item).then((t) => {
+          if (t && item.auto) { item.title = t; persist(); render(); }
+        });
+      }
+    }
+    persist();
+    play(item);
+    input.value = '';
+  });
+
+  input.addEventListener('input', () => { if (msg.classList.contains('error')) say(DEFAULT_HINT, false); });
+
+  // pasting a valid link starts playing right away
+  input.addEventListener('paste', () => {
+    setTimeout(() => { if (parseLink(input.value)) form.requestSubmit(); }, 0);
+  });
+
+  /* ── start ── */
+  render();
+  const last = library.find((i) => i.key === currentKey);
+  if (last) play(last);
+})();
+</script>
+</body>
+</html>

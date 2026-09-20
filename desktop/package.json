@@ -11,8 +11,8 @@
     "start": "electron .",
     "dist": "electron-builder --win nsis --x64 --publish never"
   },
-  "devDependencies": {
-    "electron": "github:castlabs/electron-releases#v44.1.0+wvcus",
+"devDependencies": {
+    "electron": "^33.2.0",
     "electron-builder": "^25.1.8"
   },
   "build": {

@@ -34,15 +34,15 @@ jobs:
           SITE_URL: ${{ env.SITE_URL }}
         run: |
           if [ -z "$SITE_URL" ]; then
-            echo "::error::آدرس سایت داده نشده."
+            echo "::error::آدرس سایت داده نشده. موقع Run workflow آدرس رو بنویس، یا توی Settings > Secrets and variables > Actions > Variables یه متغیر به اسم SITE_URL بساز."
             exit 1
           fi
           node -e "require('fs').writeFileSync('config.json', JSON.stringify({ url: process.env.SITE_URL }))"
 
-      - name: Install
+      - name: Install dependencies
         run: npm install
 
-      - name: Disable Defender Realtime Scan
+      - name: Disable Windows Defender Realtime Scan
         shell: powershell
         run: Set-MpPreference -DisableRealtimeMonitoring $true
 

@@ -7,7 +7,7 @@ on:
         description: 'آدرس سایتت (مثلاً https://example.com/). اگه خالی بذاری از Variables با اسم SITE_URL خونده می‌شه'
         required: false
   push:
-    tags: ['v*']            # با ساختن تگ مثل v1.0.0 لینک دانلود دائمی توی Releases ساخته می‌شه
+    tags: ['v*']
 
 permissions:
   contents: write
@@ -30,15 +30,21 @@ jobs:
 
       - name: Set site URL
         shell: bash
+        env:
+          SITE_URL: ${{ env.SITE_URL }}
         run: |
           if [ -z "$SITE_URL" ]; then
-            echo "::error::آدرس سایت داده نشده. موقع Run workflow آدرس رو بنویس، یا توی Settings > Secrets and variables > Actions > Variables یه متغیر به اسم SITE_URL بساز."
+            echo "::error::آدرس سایت داده نشده."
             exit 1
           fi
           node -e "require('fs').writeFileSync('config.json', JSON.stringify({ url: process.env.SITE_URL }))"
 
       - name: Install
         run: npm install
+
+      - name: Disable Defender Realtime Scan
+        shell: powershell
+        run: Set-MpPreference -DisableRealtimeMonitoring $true
 
       - name: Build installer
         run: npm run dist

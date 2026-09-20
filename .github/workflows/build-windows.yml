@@ -1,0 +1,56 @@
+name: Build Windows installer
+
+on:
+  workflow_dispatch:
+    inputs:
+      site_url:
+        description: 'آدرس سایتت (مثلاً https://example.com/). اگه خالی بذاری از Variables با اسم SITE_URL خونده می‌شه'
+        required: false
+  push:
+    tags: ['v*']            # با ساختن تگ مثل v1.0.0 لینک دانلود دائمی توی Releases ساخته می‌شه
+
+permissions:
+  contents: write
+
+env:
+  SITE_URL: ${{ github.event.inputs.site_url || vars.SITE_URL }}
+
+jobs:
+  build:
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: desktop
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Set site URL
+        shell: bash
+        run: |
+          if [ -z "$SITE_URL" ]; then
+            echo "::error::آدرس سایت داده نشده. موقع Run workflow آدرس رو بنویس، یا توی Settings > Secrets and variables > Actions > Variables یه متغیر به اسم SITE_URL بساز."
+            exit 1
+          fi
+          node -e "require('fs').writeFileSync('config.json', JSON.stringify({ url: process.env.SITE_URL }))"
+
+      - name: Install
+        run: npm install
+
+      - name: Build installer
+        run: npm run dist
+
+      - name: Upload installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: Gramafon-Windows-Setup
+          path: desktop/dist/*.exe
+
+      - name: Attach to release (tag builds only)
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: desktop/dist/*.exe

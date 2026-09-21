@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#120a1a">
+<script>(function(){try{var p=localStorage.getItem('gramafon:scheme');p=p?JSON.parse(p):'dark';var l=p==='light'||(p==='auto'&&matchMedia('(prefers-color-scheme: light)').matches);document.documentElement.dataset.scheme=l?'light':'dark';}catch(e){document.documentElement.dataset.scheme='dark';}})();</script>
 <title>گرامافون</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -33,6 +34,12 @@
     --groove-b: #0a050f;
     --ring: #07030b;
     --danger: #ff8a8a;
+    --accent-ink: var(--accent);       /* accent used for text/links */
+    --hover: rgba(255,255,255,.06);
+    --shadow: rgba(0,0,0,.7);
+    --glow: 30%;
+    --notice-bg: #3a1d2b;
+    --notice-line: #7a3550;
   }
   html[data-theme="spotify"] {
     --bg: #07130c;
@@ -130,7 +137,7 @@
     text-decoration: none;
     transition: color .15s, border-color .15s;
   }
-  .social a:hover { color: var(--accent); border-color: var(--accent); }
+  .social a:hover { color: var(--accent-ink); border-color: var(--accent); }
   .social svg { width: 16px; height: 16px; flex: none; }
 
   /* ───────── hero + form ───────── */
@@ -202,7 +209,7 @@
     width: calc(var(--size) * 1.7);
     height: calc(var(--size) * 1.1);
     transform: translateX(-50%);
-    background: radial-gradient(closest-side, color-mix(in srgb, var(--accent) 30%, transparent), transparent);
+    background: radial-gradient(closest-side, color-mix(in srgb, var(--accent) var(--glow), transparent), transparent);
     opacity: 0;
     transition: opacity 1s .3s;
     pointer-events: none;
@@ -286,7 +293,7 @@
     background: var(--surface);
     border: 1px solid var(--line);
     border-radius: 22px;
-    box-shadow: 0 30px 60px -30px rgba(0,0,0,.7);
+    box-shadow: 0 30px 60px -30px var(--shadow);
     transition: background-color .7s, border-color .7s;
   }
 
@@ -308,14 +315,14 @@
   .empty span { max-width: 36ch; color: var(--muted); }
 
   .caption { margin: 14px 6px 0; font-size: .875rem; color: var(--muted); min-height: 1.4em; }
-  .caption a { color: var(--accent); text-underline-offset: 3px; }
+  .caption a { color: var(--accent-ink); text-underline-offset: 3px; }
   .caption .warn { color: var(--danger); }
 
   .notice {
     margin: 0 0 24px;
     padding: 12px 16px;
-    background: #3a1d2b;
-    border: 1px solid #7a3550;
+    background: var(--notice-bg);
+    border: 1px solid var(--notice-line);
     border-radius: 14px;
     color: var(--text);
     font-size: .9375rem;
@@ -346,7 +353,7 @@
     overflow: hidden;
   }
   .np-artist { color: var(--muted); font-size: .9375rem; line-height: 1.6; }
-  .np-link { justify-self: start; font-size: .8125rem; color: var(--accent); text-underline-offset: 3px; }
+  .np-link { justify-self: start; font-size: .8125rem; color: var(--accent-ink); text-underline-offset: 3px; }
 
   .seek {
     display: grid;
@@ -412,7 +419,7 @@
     cursor: pointer;
     transition: background-color .15s, opacity .15s;
   }
-  .cbtn:hover:not(:disabled) { background: rgba(255,255,255,.08); }
+  .cbtn:hover:not(:disabled) { background: var(--hover); }
   .cbtn:disabled { opacity: .35; cursor: default; }
   .cbtn svg { width: 22px; height: 22px; }
 
@@ -424,9 +431,6 @@
   }
   .cbtn.play:hover:not(:disabled) { background: var(--accent); filter: brightness(1.1); }
   .cbtn.play svg { width: 26px; height: 26px; }
-  .cbtn.play .i-pause { display: none; }
-  .is-playing .cbtn.play .i-pause { display: block; }
-  .is-playing .cbtn.play .i-play { display: none; }
 
   .vol { justify-self: end; display: flex; align-items: center; gap: 10px; color: var(--muted); }
   .vol svg { width: 18px; height: 18px; flex: none; }
@@ -454,12 +458,12 @@
     text-align: start;
     cursor: pointer;
   }
-  .track-btn:hover { background: rgba(255,255,255,.05); }
+  .track-btn:hover { background: var(--hover); }
   .track.current .track-btn { background: var(--surface-2); }
   .track-num { display: grid; place-items: center; font-size: .8125rem; color: var(--dim); }
   .track-text { min-width: 0; display: grid; }
   .track-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; line-height: 1.6; }
-  .track.current .track-title { color: var(--accent); font-weight: 500; }
+  .track.current .track-title { color: var(--accent-ink); font-weight: 500; }
   .track-artist { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: .8125rem; color: var(--muted); line-height: 1.5; }
   .track-time { font-size: .8125rem; color: var(--muted); direction: ltr; font-variant-numeric: tabular-nums; }
 
@@ -503,7 +507,7 @@
     text-underline-offset: 3px;
     cursor: pointer;
   }
-  .linkbtn:hover { color: var(--accent); }
+  .linkbtn:hover { color: var(--accent-ink); }
 
   /* ───────── library ───────── */
   .library {
@@ -545,7 +549,7 @@
     text-align: start;
     cursor: pointer;
   }
-  .item:not(.active) .item-main:hover { background: rgba(255,255,255,.04); }
+  .item:not(.active) .item-main:hover { background: var(--hover); }
 
   .src-dot { flex: none; width: 10px; height: 10px; border-radius: 50%; }
   .item-text { min-width: 0; display: grid; }
@@ -566,7 +570,7 @@
     cursor: pointer;
     transition: color .15s, background-color .15s;
   }
-  .icon-btn:hover { color: var(--text); background: rgba(255,255,255,.08); }
+  .icon-btn:hover { color: var(--text); background: var(--hover); }
   .icon-btn.danger:hover { color: var(--danger); }
   .icon-btn svg { width: 16px; height: 16px; }
   .item-actions { display: flex; padding-inline-end: 6px; }
@@ -678,7 +682,7 @@
     border: 1px solid var(--accent);
     border-radius: 999px;
     background: transparent;
-    color: var(--accent);
+    color: var(--accent-ink);
     font-size: .875rem;
     cursor: pointer;
     transition: background-color .15s, color .15s;
@@ -702,7 +706,7 @@
   }
   .tip b { color: var(--text); font-weight: 500; direction: ltr; unicode-bidi: isolate; }
   .tip button { flex: none; width: 32px; height: 32px; padding: 0; background: none; border: 0; border-radius: 8px; color: var(--muted); font-size: 1.25rem; line-height: 1; cursor: pointer; }
-  .tip button:hover { color: var(--text); background: rgba(255,255,255,.08); }
+  .tip button:hover { color: var(--text); background: var(--hover); }
 
   .kbd-hint { margin: 6px 6px 0; font-size: .8125rem; color: var(--dim); line-height: 2; }
   .kbd-hint span { white-space: nowrap; margin-inline-end: 12px; }
@@ -718,6 +722,35 @@
     direction: ltr;
   }
 
+  .open-app {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin: 12px 0 0;
+    padding: 13px 20px;
+    border-radius: 14px;
+    background: var(--accent);
+    color: var(--on-accent);
+    font-weight: 700;
+    text-decoration: none;
+  }
+  .open-app:active { filter: brightness(.94); }
+  .open-browser {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 8px 0 0;
+    padding: 11px 20px;
+    border: 1px solid var(--line-hover);
+    border-radius: 14px;
+    color: var(--text);
+    font-size: .9375rem;
+    text-decoration: none;
+  }
+  .open-browser:active { background: var(--hover); }
+  .sp-tip { margin: 12px 2px 0; font-size: .8125rem; color: var(--muted); }
+
   html[data-mode="standalone"] .install, html[data-mode="standalone"] .tip { display: none !important; }
 
   /* Telegram Mini App */
@@ -731,6 +764,190 @@
   html[data-mode="tg"] .install, html[data-mode="tg"] .tip, html[data-mode="tg"] #preview-warning { display: none !important; }
   html[data-mode="tg"] body { -webkit-user-select: none; user-select: none; }
   html[data-mode="tg"] input { -webkit-user-select: text; user-select: text; }
+
+  /* ───────── dark / light switch ───────── */
+  .scheme-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 14px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--muted);
+    font-size: .875rem;
+    cursor: pointer;
+    transition: color .15s, border-color .15s;
+  }
+  .scheme-btn:hover { color: var(--accent-ink); border-color: var(--accent); }
+  .scheme-btn svg { width: 16px; height: 16px; flex: none; }
+  .scheme-btn [data-ic] { display: inline-flex; }
+  html[data-device="mobile"] .scheme-btn { padding: 8px 14px; }
+
+  /* ───────── light palettes: purple (idle) · green (Spotify) · orange (SoundCloud) ───────── */
+  html[data-scheme="light"] {
+    color-scheme: light;
+    --bg: #f6f1fa;
+    --surface: #ffffff;
+    --surface-2: #ece2f5;
+    --surface-focus: #ffffff;
+    --line: #d8c8e6;
+    --line-hover: #b89fd3;
+    --accent: #ffb454;
+    --on-accent: #2a1a3a;
+    --accent-ink: #94550a;
+    --text: #241533;
+    --muted: #5d4b72;
+    --dim: #7a678f;
+    --hover: rgba(36,21,51,.07);
+    --shadow: rgba(60,30,90,.28);
+    --glow: 22%;
+    --danger: #c62828;
+    --notice-bg: #ffe4e8;
+    --notice-line: #e2a1ad;
+  }
+  html[data-scheme="light"][data-theme="spotify"] {
+    --bg: #eef8f2;
+    --surface: #ffffff;
+    --surface-2: #dcf1e5;
+    --surface-focus: #ffffff;
+    --line: #b9dcc7;
+    --line-hover: #86c4a0;
+    --accent: #1ed760;
+    --on-accent: #06180d;
+    --accent-ink: #0b7a36;
+    --text: #0f2418;
+    --muted: #46655a;
+    --dim: #5d7d6f;
+  }
+  html[data-scheme="light"][data-theme="soundcloud"] {
+    --bg: #fff4ec;
+    --surface: #ffffff;
+    --surface-2: #ffe5d5;
+    --surface-focus: #ffffff;
+    --line: #f0c7ac;
+    --line-hover: #e29868;
+    --accent: #ff5500;
+    --on-accent: #190800;
+    --accent-ink: #b03a00;
+    --text: #2b150a;
+    --muted: #6c4e3e;
+    --dim: #866553;
+  }
+  /* iOS home-screen app: the status bar text is always white, so keep a dark strip behind it */
+  html.ios[data-mode="standalone"][data-scheme="light"] body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: env(safe-area-inset-top);
+    background: #241533;
+    z-index: 100;
+  }
+
+  /* ───────── light animations (only transform + opacity, so they stay smooth) ───────── */
+  @keyframes rise { from { opacity: 0; transform: translateY(14px); } }
+  @keyframes itemIn { from { opacity: 0; transform: translateY(-8px) scale(.98); } }
+  @keyframes itemOut { to { opacity: 0; transform: translateX(-26px) scale(.96); } }
+  @keyframes swapIn { from { opacity: 0; transform: translateY(8px); } }
+  @keyframes shake { 20%, 60% { transform: translateX(-6px); } 40%, 80% { transform: translateX(6px); } }
+  @keyframes turn { from { transform: rotate(-120deg) scale(.5); opacity: .3; } }
+  @keyframes ring { from { opacity: .5; transform: scale(1); } to { opacity: 0; transform: scale(1.55); } }
+  @keyframes breathe { 0%, 100% { transform: translateX(-50%) scale(1); } 50% { transform: translateX(-50%) scale(1.09); } }
+  @keyframes sweep { from { transform: translateX(-100%); } to { transform: translateX(100%); } }
+  @keyframes bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+  @keyframes fade { 50% { opacity: .45; } }
+
+  /* entrance: the page settles in, one piece after another */
+  .top { animation: rise .45s cubic-bezier(.2, .8, .2, 1) backwards; }
+  .hero h1 { animation: rise .55s cubic-bezier(.2, .8, .2, 1) 70ms backwards; }
+  .hero .lead { animation: rise .55s cubic-bezier(.2, .8, .2, 1) 140ms backwards; }
+  .hero .field { animation: rise .55s cubic-bezier(.2, .8, .2, 1) 210ms backwards; }
+  .hero .hint { animation: rise .55s cubic-bezier(.2, .8, .2, 1) 260ms backwards; }
+  .stage { animation: rise .65s cubic-bezier(.2, .8, .2, 1) 320ms backwards; }
+  .library { animation: rise .65s cubic-bezier(.2, .8, .2, 1) 400ms backwards; }
+
+  /* lists */
+  .track { animation: rise .38s cubic-bezier(.2, .8, .2, 1) calc(var(--i, 0) * 28ms) backwards; }
+  .item.enter { animation: itemIn .4s cubic-bezier(.2, .8, .2, 1) backwards; }
+  .item.leaving { animation: itemOut .19s ease forwards; pointer-events: none; }
+  .np.swap .art, .np.swap .np-text { animation: swapIn .38s cubic-bezier(.2, .8, .2, 1) backwards; }
+  .hint.shake { animation: shake .38s ease; }
+  .scheme-btn.turn [data-ic] { animation: turn .5s cubic-bezier(.3, .7, .2, 1); }
+
+  /* play button: icon morph + soft ring while music plays */
+  .cbtn.play { position: relative; }
+  .cbtn.play svg { position: absolute; inset: 0; margin: auto; transition: opacity .2s ease, transform .3s cubic-bezier(.3, .7, .2, 1); }
+  .cbtn.play .i-play { opacity: 1; transform: none; }
+  .cbtn.play .i-pause { opacity: 0; transform: scale(.5) rotate(-45deg); }
+  .is-playing .cbtn.play .i-play { opacity: 0; transform: scale(.5) rotate(45deg); }
+  .is-playing .cbtn.play .i-pause { opacity: 1; transform: none; }
+  .is-playing .cbtn.play::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 2px solid var(--accent);
+    pointer-events: none;
+    animation: ring 1.9s ease-out infinite;
+  }
+
+  /* tiny equalizer next to the logo while music plays */
+  .mini-eq { display: none; align-items: flex-end; gap: 2px; height: 16px; }
+  .mini-eq i { display: block; width: 3px; height: 30%; background: var(--accent); border-radius: 1px; animation: eq .9s ease-in-out infinite alternate; }
+  .mini-eq i:nth-child(2) { animation-delay: -.3s; }
+  .mini-eq i:nth-child(3) { animation-delay: -.6s; }
+  html.playing .mini-eq { display: inline-flex; }
+
+  /* the glow behind the record breathes while playing */
+  .stage.spin::before { animation: breathe 3.6s ease-in-out infinite; }
+
+  /* idle + loading states */
+  .empty strong { animation: bob 3.6s ease-in-out infinite; }
+  .art { position: relative; }
+  .cp.loading .art::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(100deg, transparent 20%, rgba(255,255,255,.2) 50%, transparent 80%);
+    animation: sweep 1.25s ease-in-out infinite;
+  }
+  .track.pending:nth-child(-n+14) .track-title { animation: fade 1.4s ease-in-out infinite; }
+
+  /* everything you tap feels pressable */
+  .social a, .scheme-btn, .install { transition: color .15s, border-color .15s, background-color .15s, transform .15s; }
+  .cbtn, .icon-btn { transition: background-color .15s, opacity .15s, color .15s, transform .15s; }
+  .track-btn, .item-main { transition: background-color .15s, transform .12s; }
+  .open-app, .open-browser { transition: transform .12s, filter .15s, background-color .15s; }
+  .social a:active, .scheme-btn:active, .install:active, .cbtn:active:not(:disabled), .icon-btn:active { transform: scale(.94); }
+  .track-btn:active, .item-main:active, .open-app:active, .open-browser:active { transform: scale(.98); }
+  @media (hover: hover) { .social a:hover, .scheme-btn:hover, .install:hover { transform: translateY(-1px); } }
+
+  .field input { transition: border-color .15s, background-color .4s, box-shadow .25s; }
+  .field input:focus { box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 20%, transparent); }
+
+  /* colors ease over when the theme changes (purple / green / orange) */
+  .lead, .hint, .caption, .item-meta, .np-artist, .track-artist, .time, .lib-note, .lib-empty, .sp-hint, .sp-tip, h1, h2, .brand { transition: color .5s ease; }
+
+  /* weaker phones: keep only the cheap effects */
+  html[data-perf="low"] .stage.spin::before,
+  html[data-perf="low"] .empty strong,
+  html[data-perf="low"] .cp.loading .art::after,
+  html[data-perf="low"] .track.pending .track-title,
+  html[data-perf="low"] .is-playing .cbtn.play::after,
+  html[data-perf="low"] .track { animation: none; }
+
+  /* people who asked their device for less motion get none */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: .001ms !important;
+      animation-delay: 0s !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: .001ms !important;
+      transition-delay: 0s !important;
+    }
+  }
 </style>
 </head>
 <body>
@@ -750,9 +967,11 @@
         <circle class="b-hole" cx="16" cy="16" r="1.4"/>
       </svg>
       گرامافون
+      <span class="mini-eq" aria-hidden="true"><i></i><i></i><i></i></span>
     </span>
 
     <nav class="social" aria-label="راه‌های ارتباطی">
+      <button type="button" id="scheme-btn" class="scheme-btn" aria-label="حالت نمایش"><span data-ic></span><span data-label>تیره</span></button>
       <button type="button" id="install-btn" class="install" hidden>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>
         نصب اپ
@@ -843,6 +1062,8 @@
   const touchOnly = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
   const IS_MOBILE = mobileUA || IS_IOS || IS_ANDROID || touchOnly;
   const isStandalone = () => window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+  const lowEnd = (navigator.deviceMemory && navigator.deviceMemory <= 2) || (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 2);
+  docEl.dataset.perf = lowEnd ? 'low' : 'normal';
   docEl.dataset.device = IS_MOBILE ? 'mobile' : 'desktop';
   docEl.dataset.platform = IS_IOS ? 'ios' : IS_ANDROID ? 'android' : 'other';
   docEl.dataset.mode = /tgWebApp/i.test(location.hash) ? 'tg' : isStandalone() ? 'standalone' : 'browser';
@@ -873,9 +1094,13 @@
   let swapTimer = null;
   let mountToken = 0;
   let active = null;
+  let justAddedKey = null;
 
   /* ── theme + Telegram / browser bar colors ── */
-  const THEME_BG = { '': '#120a1a', spotify: '#07130c', soundcloud: '#170a04' };
+  const BAR = {
+    dark:  { '': '#120a1a', spotify: '#07130c', soundcloud: '#170a04' },
+    light: { '': '#f6f1fa', spotify: '#eef8f2', soundcloud: '#fff4ec' }
+  };
 
   // a real Telegram Mini App has a platform; the plain SDK in a normal browser says 'unknown'
   const getTg = () => {
@@ -889,12 +1114,15 @@
     try { tg.setBackgroundColor(c); } catch {}
     try { tg.setBottomBarColor(c); } catch {}
   }
-  function setTheme(source) {
-    docEl.dataset.theme = source || '';
-    const c = THEME_BG[source || ''];
+  function applyBarColors() {
+    const c = BAR[docEl.dataset.scheme === 'light' ? 'light' : 'dark'][docEl.dataset.theme || ''];
     const m = document.querySelector('meta[name="theme-color"]');
     if (m) m.content = c;
     tgColors(c);
+  }
+  function setTheme(source) {
+    docEl.dataset.theme = source || '';
+    applyBarColors();
   }
   function tgInsets() {
     const tg = getTg();
@@ -910,7 +1138,7 @@
     try { tg.ready(); } catch {}
     try { tg.expand(); } catch {}
     try { if (tg.disableVerticalSwipes) tg.disableVerticalSwipes(); } catch {}
-    tgColors(THEME_BG[docEl.dataset.theme || '']);
+    applyBarColors();
     tgInsets();
     try { tg.onEvent('safeAreaChanged', tgInsets); tg.onEvent('contentSafeAreaChanged', tgInsets); } catch {}
   }
@@ -948,6 +1176,13 @@
     const h = Math.floor(t / 3600), m = Math.floor((t % 3600) / 60), s = t % 60;
     return (h ? `${h}:${String(m).padStart(2, '0')}` : `${m}`) + ':' + String(s).padStart(2, '0');
   };
+  // replay a one-shot CSS animation
+  function pulse(el, cls) {
+    if (!el) return;
+    el.classList.remove(cls);
+    void el.offsetWidth;
+    el.classList.add(cls);
+  }
   const isHttps = (u) => typeof u === 'string' && /^https:\/\//i.test(u);
 
   /* ── link parsing ── */
@@ -1062,7 +1297,7 @@
     f.title = item.title || 'پلیر';
 
     if (item.source === 'spotify') {
-      f.src = `https://open.spotify.com/embed/${item.type}/${item.id}?utm_source=generator&theme=0`;
+      f.src = `https://open.spotify.com/embed/${item.type}/${item.id}?utm_source=generator${docEl.dataset.scheme === 'light' ? '' : '&theme=0'}`;
       f.style.height = ((item.type === 'track' || item.type === 'episode') ? 152 : 380) + 'px';
     } else {
       const compact = item.type === 'track';
@@ -1142,7 +1377,7 @@
 
   function createScPlayer(item, { onPlaying }) {
     const root = document.createElement('div');
-    root.className = 'cp';
+    root.className = 'cp loading';
     root.innerHTML = CP_TEMPLATE;
     const q = (s) => root.querySelector(s);
     const els = {
@@ -1189,6 +1424,7 @@
     function fail(text) {
       if (dead) return;
       clearTimeout(readyTimer);
+      root.classList.remove('loading');
       showOfficial(true);
       note.textContent = text;
       note.classList.remove('info');
@@ -1259,6 +1495,7 @@
       sounds.forEach((s, i) => {
         const li = document.createElement('li');
         li.className = 'track';
+        li.style.setProperty('--i', String(Math.min(i, 12)));
         const b = document.createElement('button');
         b.type = 'button';
         b.className = 'track-btn';
@@ -1302,7 +1539,7 @@
         if (typeof i !== 'number' || i < 0) return;
         const changed = i !== idx;
         idx = i;
-        if (changed) showTrack();
+        if (changed) { showTrack(); pulse(q('.np'), 'swap'); }
         W.getCurrentSound((s) => mergeSound(idx, s));
       });
     }
@@ -1340,6 +1577,7 @@
         els.play.disabled = false;
         els.seek.disabled = false;
         showTrack();
+        root.classList.remove('loading');
         if (stubs().length) hydrate();
       });
     }
@@ -1473,13 +1711,33 @@
 
   function createSpPlayer(item, api, { onPlaying }) {
     const root = document.createElement('div');
-    root.className = 'cp';
+    root.className = 'cp loading';
     root.innerHTML = SP_TEMPLATE;
     const q = (s) => root.querySelector(s);
     const els = {
       art: q('[data-art]'), title: q('[data-title]'), artist: q('[data-artist]'),
       pos: q('[data-pos]'), dur: q('[data-dur]'), seek: q('[data-seek]')
     };
+    if (compactMode()) {
+      const hint = q('.sp-hint');
+      hint.textContent = 'پلیر پایین روی گوشی و توی تلگرام معمولاً فقط ۳۰ ثانیه از هر آهنگ رو پخش می‌کنه. برای پخش کامل، توی اپ اسپاتیفای بازش کن:';
+      const appBtn = openAppLink(item);
+      hint.after(appBtn);
+      if (docEl.dataset.mode === 'tg') {
+        const b = document.createElement('a');
+        b.className = 'open-browser';
+        b.href = `${location.origin}${location.pathname}?l=${encodeURIComponent(item.url)}`;
+        b.target = '_blank';
+        b.rel = 'noopener noreferrer';
+        b.textContent = 'یا همین پلی‌لیست رو توی مرورگر گوشی باز کن';
+        appBtn.after(b);
+      } else {
+        const tip = document.createElement('p');
+        tip.className = 'sp-tip';
+        tip.textContent = 'یا توی Chrome منوی ⋮ و بعد «Desktop site» رو بزن و صفحه رو دوباره لود کن؛ روی بعضی گوشی‌ها با این کار پلیر اسپاتیفای کامل پخش می‌کنه.';
+        appBtn.after(tip);
+      }
+    }
     const host = document.createElement('div');
     host.className = 'sp-embed';
     const placeholder = document.createElement('div');
@@ -1496,6 +1754,7 @@
     fillRange(els.seek);
 
     spotifyMeta(item.url).then((m) => {
+      root.classList.remove('loading');
       if (dead || !m) return;
       if (m.title) containerTitle = m.title;
       if (!currentUri) {
@@ -1510,6 +1769,7 @@
       currentUri = uri;
       spotifyMeta(`https://open.spotify.com/${m[1]}/${m[2]}`).then((meta) => {
         if (dead || currentUri !== uri) return;
+        pulse(q('.np'), 'swap');
         if (!meta) { els.artist.textContent = 'اسم آهنگ رو توی پلیر پایین ببین'; return; }
         if (meta.title) els.title.textContent = meta.title;
         makeArt(els.art, meta.thumb);
@@ -1569,6 +1829,26 @@
     };
   }
 
+  // one place that reacts to "music is playing / stopped"
+  function setPlayingUi(p) {
+    stage.classList.toggle('spin', p);
+    docEl.classList.toggle('playing', p);
+  }
+
+  // phones and Telegram: Spotify's embedded player usually only gives 30-second previews there
+  // Chrome's "Desktop site" on a phone sends a desktop user-agent; Spotify's player then gives full playback
+  const desktopSiteOnPhone = touchOnly && !mobileUA && !IS_IOS && !IS_ANDROID;
+  const compactMode = () => (docEl.dataset.device === 'mobile' && !desktopSiteOnPhone) || docEl.dataset.mode === 'tg';
+  function openAppLink(item) {
+    const a = document.createElement('a');
+    a.className = 'open-app';
+    a.href = item.url;
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+    a.textContent = 'پخش کامل توی اپ اسپاتیفای';
+    return a;
+  }
+
   /* ── keyboard shortcuts (desktop only) ── */
   const kbd = $('#kbd');
   function setKbdHint(kind) {
@@ -1617,14 +1897,21 @@
 
   function mountSpotifyPlain(item, note) {
     player.replaceChildren(buildFrame(item));
-    caption.textContent = note || SPOTIFY_NOTE;
     stage.classList.add('spin');
+    if (compactMode()) {
+      caption.textContent = 'پلیر بالا روی گوشی و توی تلگرام معمولاً فقط ۳۰ ثانیه از هر آهنگ رو پخش می‌کنه. برای پخش کامل، توی اپ اسپاتیفای بازش کن:';
+      fallback.replaceChildren(openAppLink(item));
+      fallback.hidden = false;
+    } else {
+      caption.textContent = note || SPOTIFY_NOTE;
+    }
   }
 
   async function mountSpotify(item, token) {
     stage.classList.remove('spin');
-    caption.textContent = SPOTIFY_NOTE;
-    showFallback(item, false);
+    docEl.classList.remove('playing');
+    caption.textContent = compactMode() ? '' : SPOTIFY_NOTE;
+    if (!compactMode()) showFallback(item, false);
     let api;
     try {
       api = await loadSpotifyApi();
@@ -1634,13 +1921,13 @@
     }
     if (token !== mountToken) return;
     const sp = createSpPlayer(item, api, {
-      onPlaying: (p) => { if (token === mountToken) stage.classList.toggle('spin', p); }
+      onPlaying: (p) => { if (token === mountToken) setPlayingUi(p); }
     });
     active = sp;
     player.replaceChildren(sp.root);
     sp.start();
     setKbdHint('sp');
-    setTimeout(() => { if (token === mountToken && !sp.isReady()) showFallback(item, true); }, 10000);
+    setTimeout(() => { if (token === mountToken && !sp.isReady() && !compactMode()) showFallback(item, true); }, 10000);
   }
 
   function mountOfficialOnly(item, note) {
@@ -1651,6 +1938,7 @@
 
   async function mountSoundCloud(item, token) {
     stage.classList.remove('spin');
+    docEl.classList.remove('playing');
     caption.textContent = 'در حال آماده‌سازی پلیر…';
     showFallback(item, false);
     try {
@@ -1662,7 +1950,7 @@
     if (token !== mountToken) return;
     caption.textContent = '';
     const sc = createScPlayer(item, {
-      onPlaying: (p) => { if (token === mountToken) stage.classList.toggle('spin', p); }
+      onPlaying: (p) => { if (token === mountToken) setPlayingUi(p); }
     });
     active = sc;
     player.replaceChildren(sc.root, sc.official, sc.foot);
@@ -1694,6 +1982,7 @@
     clearTimeout(swapTimer);
     if (stage.classList.contains('out') && !reduceMotion) {
       stage.classList.remove('out', 'spin');   // record slides back in…
+      docEl.classList.remove('playing');
       swapTimer = setTimeout(mount, 450);      // …then the new one comes out
     } else {
       mount();
@@ -1734,7 +2023,7 @@
 
     library.forEach((item) => {
       const li = document.createElement('li');
-      li.className = 'item' + (item.key === currentKey ? ' active' : '');
+      li.className = 'item' + (item.key === currentKey ? ' active' : '') + (item.key === justAddedKey ? ' enter' : '');
 
       const main = document.createElement('button');
       main.type = 'button';
@@ -1765,21 +2054,43 @@
           if (n && n.trim()) { item.title = n.trim(); item.auto = false; persist(); render(); }
         }),
         iconButton(ICON_TRASH, 'حذف از کتابخونه', 'danger', () => {
-          library = library.filter((i) => i !== item);
-          persist();
-          render();
+          if (li.classList.contains('leaving')) return;
+          li.classList.add('leaving');
+          const finish = () => { library = library.filter((i) => i !== item); persist(); render(); };
+          if (reduceMotion) finish(); else setTimeout(finish, 190);
         })
       );
 
       li.append(main, actions);
       list.append(li);
     });
+    justAddedKey = null;
   }
 
   /* ── form ── */
   function say(text, isError) {
     msg.textContent = text;
     msg.classList.toggle('error', !!isError);
+    if (isError) pulse(msg, 'shake');
+  }
+
+  function addAndPlay(parsed) {
+    const key = `${parsed.source}|${parsed.url}`;
+    let item = library.find((i) => i.key === key);
+    if (item) {
+      library = [item, ...library.filter((i) => i !== item)];
+    } else {
+      item = { ...parsed, key, title: parsed.title || defaultTitle(parsed), auto: !parsed.title };
+      library.unshift(item);
+      justAddedKey = key;
+      if (item.auto) {
+        fetchTitle(item).then((t) => {
+          if (t && item.auto) { item.title = t; persist(); render(); }
+        });
+      }
+    }
+    persist();
+    play(item);
   }
 
   form.addEventListener('submit', async (e) => {
@@ -1805,21 +2116,7 @@
     }
     say(DEFAULT_HINT, false);
 
-    const key = `${parsed.source}|${parsed.url}`;
-    let item = library.find((i) => i.key === key);
-    if (item) {
-      library = [item, ...library.filter((i) => i !== item)];
-    } else {
-      item = { ...parsed, key, title: parsed.title || defaultTitle(parsed), auto: !parsed.title };
-      library.unshift(item);
-      if (item.auto) {
-        fetchTitle(item).then((t) => {
-          if (t && item.auto) { item.title = t; persist(); render(); }
-        });
-      }
-    }
-    persist();
-    play(item);
+    addAndPlay(parsed);
     input.value = '';
     input.blur();
   });
@@ -1830,6 +2127,38 @@
   input.addEventListener('paste', () => {
     setTimeout(() => { if (parseLink(input.value)) form.requestSubmit(); }, 0);
   });
+
+  /* ── dark / light / auto ── */
+  const SCHEME_KEY = 'gramafon:scheme';
+  const SCHEMES = ['dark', 'light', 'auto'];
+  const SCHEME_LABEL = { dark: 'تیره', light: 'روشن', auto: 'خودکار' };
+  const SCHEME_ICON = {
+    dark: svg('<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>'),
+    light: svg('<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>'),
+    auto: svg('<circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor"/>')
+  };
+  const schemeBtn = $('#scheme-btn');
+  const mqLight = window.matchMedia('(prefers-color-scheme: light)');
+  let schemePref = read(SCHEME_KEY, 'dark');
+  if (!SCHEMES.includes(schemePref)) schemePref = 'dark';
+
+  function applyScheme() {
+    docEl.dataset.scheme = schemePref === 'auto' ? (mqLight.matches ? 'light' : 'dark') : schemePref;
+    docEl.dataset.schemePref = schemePref;
+    schemeBtn.querySelector('[data-ic]').innerHTML = SCHEME_ICON[schemePref];
+    schemeBtn.querySelector('[data-label]').textContent = SCHEME_LABEL[schemePref];
+    schemeBtn.setAttribute('aria-label', 'حالت نمایش: ' + SCHEME_LABEL[schemePref] + '، برای تغییر بزن');
+    applyBarColors();
+  }
+  schemeBtn.addEventListener('click', () => {
+    schemePref = SCHEMES[(SCHEMES.indexOf(schemePref) + 1) % SCHEMES.length];
+    write(SCHEME_KEY, schemePref);
+    pulse(schemeBtn, 'turn');
+    if (document.startViewTransition && !reduceMotion && docEl.dataset.perf !== 'low') document.startViewTransition(applyScheme);
+    else applyScheme();
+  });
+  try { mqLight.addEventListener('change', () => { if (schemePref === 'auto') applyScheme(); }); } catch {}
+  applyScheme();
 
   /* ── install as an app (PWA) ── */
   const installBtn = $('#install-btn'), iosTip = $('#ios-tip');
@@ -1864,8 +2193,15 @@
 
   /* ── start ── */
   render();
-  const last = library.find((i) => i.key === currentKey);
-  if (last) play(last);
+  const shared = new URLSearchParams(location.search).get('l');
+  const sharedParsed = shared ? parseLink(shared) : null;
+  if (sharedParsed && !sharedParsed.error && sharedParsed.type !== 'link') {
+    try { history.replaceState(null, '', location.pathname + location.hash); } catch {}
+    addAndPlay(sharedParsed);
+  } else {
+    const last = library.find((i) => i.key === currentKey);
+    if (last) play(last);
+  }
 })();
 
 </script>

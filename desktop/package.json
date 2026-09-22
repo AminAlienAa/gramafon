@@ -13,9 +13,9 @@
     "dist:mac": "electron-builder --mac dmg --publish never"
   },
   "devDependencies": {
-    "electron": "github:castlabs/electron-releases#v44.1.0+wvcus",
-    "electron-builder": "^25.1.8"
-  },
+  "electron": "^31.0.0",
+  "electron-builder": "^25.1.8"
+},
   "build": {
     "appId": "app.gramafon.desktop",
     "productName": "Gramafon",

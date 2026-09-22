@@ -1,0 +1,55 @@
+name: Build macOS app
+
+on:
+  workflow_dispatch:
+    inputs:
+      site_url:
+        description: 'آدرس سایتت (مثلاً https://example.com/). اگه خالی بذاری از Variables با اسم SITE_URL خونده می‌شه'
+        required: false
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+env:
+  SITE_URL: ${{ github.event.inputs.site_url || vars.SITE_URL }}
+
+jobs:
+  build:
+    runs-on: macos-latest
+    defaults:
+      run:
+        working-directory: desktop
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Set site URL
+        run: |
+          if [ -z "$SITE_URL" ]; then
+            echo "::error::آدرس سایت داده نشده. موقع Run workflow آدرس رو بنویس، یا توی Settings > Secrets and variables > Actions > Variables یه متغیر به اسم SITE_URL بساز."
+            exit 1
+          fi
+          node -e "require('fs').writeFileSync('config.json', JSON.stringify({ url: process.env.SITE_URL }))"
+
+      - name: Install
+        run: npm install
+
+      - name: Build dmg
+        run: npm run dist:mac
+
+      - name: Upload dmg
+        uses: actions/upload-artifact@v4
+        with:
+          name: Gramafon-Mac
+          path: desktop/dist/*.dmg
+
+      - name: Attach to release (tag builds only)
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: desktop/dist/*.dmg

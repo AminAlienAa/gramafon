@@ -36,11 +36,17 @@ jobs:
           fi
           node -e "require('fs').writeFileSync('config.json', JSON.stringify({ url: process.env.SITE_URL }))"
 
-      - name: Install
-        run: npm install
+      - name: Clear Electron Cache
+        run: rm -rf ~/Library/Caches/electron ~/Library/Caches/electron-builder
+
+      - name: Install dependencies
+        run: npm ci || npm install
 
       - name: Build dmg
         run: npm run dist:mac
+        env:
+          ELECTRON_CACHE: ~/.cache/electron
+          ELECTRON_BUILDER_CACHE: ~/.cache/electron-builder
 
       - name: Upload dmg
         uses: actions/upload-artifact@v4

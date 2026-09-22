@@ -1,0 +1,73 @@
+{
+  "name": "gramafon-desktop",
+  "productName": "Gramafon",
+  "version": "1.0.0",
+  "description": "گرامافون: پخش پلی‌لیست ساندکلود و اسپاتیفای",
+  "author": "Alienam",
+  "license": "UNLICENSED",
+  "private": true,
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --win nsis --x64 --publish never",
+    "dist:mac": "electron-builder --mac dmg --publish never"
+  },
+  "devDependencies": {
+    "electron": "github:castlabs/electron-releases#v44.1.0+wvcus",
+    "electron-builder": "^25.1.8"
+  },
+  "build": {
+    "appId": "app.gramafon.desktop",
+    "productName": "Gramafon",
+    "electronDist": "node_modules/electron/dist",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "main.js",
+      "config.json",
+      "offline.html",
+      "build/icon.png"
+    ],
+    "win": {
+      "icon": "build/icon.ico",
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "گرامافون",
+      "artifactName": "Gramafon-Setup-${version}.exe"
+    },
+    "afterPack": "adhoc-sign.js",
+    "mac": {
+      "icon": "build/icon.png",
+      "category": "public.app-category.music",
+      "identity": null,
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "arm64",
+            "x64"
+          ]
+        }
+      ],
+      "artifactName": "Gramafon-Mac-${arch}.${ext}"
+    },
+    "dmg": {
+      "title": "Gramafon"
+    }
+  }
+}

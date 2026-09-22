@@ -1,0 +1,57 @@
+name: Build Android APK
+
+on:
+  workflow_dispatch:
+    inputs:
+      site_url:
+        description: 'آدرس سایتت (مثلاً https://example.com/). اگه خالی بذاری از Variables با اسم SITE_URL خونده می‌شه'
+        required: false
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+env:
+  SITE_URL: ${{ github.event.inputs.site_url || vars.SITE_URL }}
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check site URL
+        run: |
+          if [ -z "$SITE_URL" ]; then
+            echo "::error::آدرس سایت داده نشده. موقع Run workflow آدرس رو بنویس، یا توی Settings > Secrets and variables > Actions > Variables یه متغیر به اسم SITE_URL بساز."
+            exit 1
+          fi
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Build APK
+        working-directory: android
+        run: gradle assembleDebug -PsiteUrl="$SITE_URL" --no-daemon
+
+      - name: Collect APK
+        run: cp android/app/build/outputs/apk/debug/app-debug.apk Gramafon.apk
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Gramafon-Android-APK
+          path: Gramafon.apk
+
+      - name: Attach to release (tag builds only)
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: Gramafon.apk

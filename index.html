@@ -1099,11 +1099,38 @@
     transition-duration: .001ms !important;
     transition-delay: 0s !important;
   }
+
+  /* ───────── deprecated-version warning ───────── */
+  .deprecated-warning {
+    margin: 0 0 16px;
+    padding: 14px 16px;
+    border: 1px solid #ff4d4d;
+    border-radius: 12px;
+    background: rgba(255, 40, 40, .14);
+    color: #ff4d4d;
+    font-weight: 700;
+    line-height: 1.9;
+    text-align: right;
+  }
+  .deprecated-warning .dw-title { display: block; }
+  .deprecated-warning ul { margin: 6px 0 0; padding: 0; list-style: none; }
+  .deprecated-warning li { direction: ltr; text-align: right; word-break: break-all; }
+  .deprecated-warning a { color: #ff4d4d; text-decoration: underline; }
+  html[data-scheme="light"] .deprecated-warning { background: #ffe3e3; color: #c40000; border-color: #e03030; }
+  html[data-scheme="light"] .deprecated-warning a { color: #c40000; }
 </style>
 </head>
 <body>
 <div class="bg-deco" aria-hidden="true"><span class="b1"></span><span class="b2"></span><span class="b3"></span><span class="spark"></span><span class="mote m1"></span><span class="mote m2"></span><span class="mote m3"></span><span class="mote m4"></span><span class="beam t1"></span><span class="beam t2 alt"></span><span class="beam u1"></span></div>
 <div class="page">
+
+  <div class="deprecated-warning" role="alert">
+    <span class="dw-title">⚠ این نسخه منسوخ شده است. برای آپدیت به لینک‌های زیر بروید:</span>
+    <ul>
+      <li>Android: <a href="https://github.com/AminAlienAa/gramafon/releases/download/1.0.2WEB/Gramafon.Android.1.0.2.WEB.apk" target="_blank" rel="noopener">https://github.com/AminAlienAa/gramafon/releases/download/1.0.2WEB/Gramafon.Android.1.0.2.WEB.apk</a></li>
+      <li>Windows: <a href="https://github.com/AminAlienAa/gramafon/releases/download/1.0.2WEB/Gramafon.Windows.1.0.2.WEB.exe" target="_blank" rel="noopener">https://github.com/AminAlienAa/gramafon/releases/download/1.0.2WEB/Gramafon.Windows.1.0.2.WEB.exe</a></li>
+    </ul>
+  </div>
 
   <p id="preview-warning" class="notice" role="alert" hidden data-i18n="previewWarning"></p>
 

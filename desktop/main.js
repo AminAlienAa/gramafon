@@ -5,6 +5,16 @@ const { app, BrowserWindow, shell, Menu, session, globalShortcut, components } =
 const path = require('path');
 const config = require('./config.json');
 
+// hosts allowed to open as in-app popups (Spotify login + the social sign-ins it offers)
+const LOGIN_HOST = /(^|\.)(spotify\.com|scdn\.co|spotifycdn\.com|accounts\.google\.com|facebook\.com|appleid\.apple\.com|apple\.com)$/i;
+function isLoginUrl(url) {
+  if (url === 'about:blank') return true;   // window.open() first opens a blank window, then navigates it
+  try {
+    const u = new URL(url);
+    return u.protocol === 'https:' && LOGIN_HOST.test(u.hostname);
+  } catch { return false; }
+}
+
 const APP_URL = String(config.url || '');
 let APP_ORIGIN = '';
 try { APP_ORIGIN = new URL(APP_URL).origin; } catch {}
@@ -34,6 +44,23 @@ if (!app.requestSingleInstanceLock()) {
       `document.dispatchEvent(new KeyboardEvent('keydown',{key:${JSON.stringify(key)},bubbles:true}))`
     ).catch(() => {});
   };
+
+  // backup: Ctrl+Shift+S opens the Spotify login page inside the app (same session as the player)
+  function openSpotifyLogin() {
+    const w = new BrowserWindow({
+      width: 520, height: 740, parent: win || undefined, autoHideMenuBar: true, title: 'Spotify',
+      webPreferences: { contextIsolation: true, sandbox: true, nodeIntegration: false }
+    });
+    w.webContents.setWindowOpenHandler(({ url }) => (isLoginUrl(url) ? { action: 'allow' } : { action: 'deny' }));
+    w.loadURL('https://accounts.spotify.com/login');
+    w.webContents.on('did-navigate', (e, url) => {
+      // logged in -> Spotify redirects away from /login; close and reload the player
+      if (/^https:\/\/(open|www)\.spotify\.com\//i.test(url) || /accounts\.spotify\.com\/(en\/)?status/i.test(url)) {
+        w.close();
+        if (win) win.webContents.reload();
+      }
+    });
+  }
 
   function createWindow() {
     win = new BrowserWindow({
@@ -67,10 +94,31 @@ if (!app.requestSingleInstanceLock()) {
 
     win.loadURL(APP_URL);
 
-    // links to other sites open in the normal browser
-    win.webContents.setWindowOpenHandler(({ url }) => {
-      if (/^https?:/i.test(url)) shell.openExternal(url);
-      return { action: 'deny' };
+    // links to other sites open in the normal browser,
+    // EXCEPT the Spotify login popup (and Google/Facebook/Apple sign-in used by Spotify):
+    // that one must open inside the app, so the login cookies land in the app's own session
+    // (otherwise the embedded player stays logged out and only plays 30-second previews)
+    const hookWindowOpen = (wc) => {
+      wc.setWindowOpenHandler(({ url }) => {
+        if (isLoginUrl(url)) {
+          return {
+            action: 'allow',
+            overrideBrowserWindowOptions: {
+              width: 520, height: 740, parent: win, autoHideMenuBar: true,
+              backgroundColor: '#ffffff', title: 'Spotify',
+              webPreferences: { contextIsolation: true, sandbox: true, nodeIntegration: false }
+            }
+          };
+        }
+        if (/^https?:/i.test(url)) shell.openExternal(url);
+        return { action: 'deny' };
+      });
+    };
+    hookWindowOpen(win.webContents);
+    // the login popup can open further popups (e.g. "Continue with Google"): same rule
+    win.webContents.on('did-create-window', (child) => {
+      child.setMenuBarVisibility(false);
+      hookWindowOpen(child.webContents);
     });
     win.webContents.on('will-navigate', (e, url) => {
       let origin = '';
@@ -93,6 +141,7 @@ if (!app.requestSingleInstanceLock()) {
       const k = input.key;
       const zoom = (d) => win.webContents.setZoomLevel(Math.max(-3, Math.min(4, win.webContents.getZoomLevel() + d)));
       if (k === 'F5' || (ctrl && k.toLowerCase() === 'r')) { win.webContents.reload(); e.preventDefault(); }
+      else if (ctrl && input.shift && k.toLowerCase() === 's') { openSpotifyLogin(); e.preventDefault(); }
       else if (k === 'F11') { win.setFullScreen(!win.isFullScreen()); e.preventDefault(); }
       else if (ctrl && (k === '=' || k === '+')) { zoom(0.5); e.preventDefault(); }
       else if (ctrl && k === '-') { zoom(-0.5); e.preventDefault(); }
